@@ -11,7 +11,7 @@ type SystemCalculation struct {
 	DateCreated          time.Time `gorm:"autoCreateTime; not null"`
 	DateFormed           time.Time `gorm:"default:null"`
 	DateAcceped          time.Time `gorm:"default:null"`
-	ModeratorID          uint
+	ModeratorID          *uint
 
 	User       User        `gorm:"foreignKey:UserID"`
 	Moderator  User        `gorm:"foreignKey:ModeratorID"`
