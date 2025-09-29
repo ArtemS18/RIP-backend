@@ -150,6 +150,7 @@ p{
     text-decoration: none;
     transition: 0.5s ease-out; 
     
+    
 }
 
 .button.add{
@@ -165,10 +166,11 @@ p{
 .left-container{
     display: flex;
     max-width: 300px;
+    align-items: center;
     
 }
 .left-container input{
-    margin-top: 20px;
+    margin-top: 10px;
     max-width: 40%;
 }
 .button.delete{
@@ -177,9 +179,15 @@ p{
     align-items: center;
     border: 1px solid #f33c42;
     color: #f33c42;
+    height: 100%;
     
 }
-
+form{
+    margin-block-end: 0px;
+}
+.button.button.delete.trash{
+    height: max-content;
+}
 
 .button.delete:hover {
   background-color: #f33c42;

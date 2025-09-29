@@ -7,8 +7,7 @@ import (
 
 func (r *Repository) GetComponents() ([]ds.Component, error) {
 	var components []ds.Component
-
-	err := r.db.Find(&components).Where("is_deleted = ?", false).Error
+	err := r.db.Where("is_deleted = ?", false).Find(&components).Error
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +25,7 @@ func (r *Repository) GetComponentById(id int) (ds.Component, error) {
 		return ds.Component{}, err
 	}
 
-	return component, fmt.Errorf("заказ не найден")
+	return component, nil
 }
 
 func (r *Repository) GetComponentsByTitle(title string) ([]ds.Component, error) {

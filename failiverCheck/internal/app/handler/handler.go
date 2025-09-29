@@ -20,7 +20,8 @@ func (h *Handler) RegisterHandlers(r *gin.Engine) {
 	r.GET("/components", h.GetComponents)
 	r.GET("/components/:id", h.GetComponent)
 	r.GET("/availability_calc/:id", h.GetSystemCalc)
-	r.POST("/components/", h.AddComponentInSystemCalc)
+	r.POST("/components", h.AddComponentInSystemCalc)
+	r.POST("/availability_calc", h.DeleteSystemCalc)
 }
 
 func (h *Handler) RegisterStatic(r *gin.Engine, path string) {

@@ -154,6 +154,7 @@ p{
 }
 input{
     transition: 0.1s ease; 
+    
 }
 input:focus { 
   box-shadow: #d1d7e1, 0px, 0px, 20px;
@@ -218,5 +219,15 @@ input:focus {
 }
 
 .add-form{
-    display: block;
+    margin-block-end: 0px;
+}
+
+.disable{
+    background-color: #d1d7e100;
+}
+.bar-chat.disable img:hover{
+    transform: none;
+}
+.bar-chat.disable{
+    cursor:default;
 }

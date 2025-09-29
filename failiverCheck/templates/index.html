@@ -25,7 +25,7 @@
             {{ range .data.Components}}
                 <div class="component">
                     <div id="img-icon">
-                        <img src= "http://localhost:9000/failivercheck/svg/{{.Img}}" alt="icon"/>
+                        <img src= "{{.Img}}" alt="icon"/>
                     </div>
                     <p> {{ .Title }}</p>
                     <div class="buttons">
@@ -42,14 +42,19 @@
             {{ end }}
             </div>
         </div>
+        {{if .data.CurrentCount}}
         <div class="bar-chat">
+            <div>{{.data.CurrentCount}}</div>
             <a href="/availability_calc/{{.data.SystemCalcId}}">
                 <img src= "http://localhost:9000/failivercheck/svg/bar-chat.svg" alt="analitics"/>
             </a>
-            {{if .data.CurrentCount}}
-            <div>{{.data.CurrentCount}}</div>
-            {{end}}
         </div>
+        {{else}}
+        <!-- <div class="bar-chat disable">
+            <img src= "http://localhost:9000/failivercheck/svg/bar-chat.svg" alt="analitics"/>
+        </div> -->
+        {{end}}
+        
     </body>
 
 </html>

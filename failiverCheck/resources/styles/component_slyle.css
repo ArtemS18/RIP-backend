@@ -49,6 +49,7 @@ header img {
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 20px;
+    max-width: 1100px;
 }
 .component{
     position: relative;
@@ -71,6 +72,7 @@ header img {
     max-height: 197px;
     align-items: center;
     font-size: 1em;
+    margin-top: 20px;
 }
 .component.settings.opt{
     max-width: 440px;
@@ -84,6 +86,23 @@ header img {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(5, 1fr);
+}
+
+@media (max-width: 1100px) {
+    #component-body {
+        display: block;
+    }
+
+    #component-body li {
+        display: block;
+        margin-bottom: 5px; 
+    }
+
+    #component-body div {
+        display: block; 
+        margin-left: 10px;
+        margin-bottom: 20px; 
+    }
 }
 .title{
     display: block;
@@ -103,6 +122,10 @@ header img {
     display: flex;
     gap: 20px;
 }
+
+.description p{
+    color: #d1d7e189;
+}
 #img-icon{
     height: max-content;
     position: relative;
@@ -115,7 +138,7 @@ header img {
 }
 p{
     padding-left: 20px;
-    color: #d1d7e189;
+    color: #d1d7e1;
 }
 li{
     display: block;
@@ -125,4 +148,3 @@ li{
 #nav-name{
     color: #d1d7e189;
 }
-

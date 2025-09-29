@@ -8,7 +8,8 @@ import (
 
 func (r *Repository) CreateSystemCalc(userId uint) (ds.SystemCalculation, error) {
 	newSystemCalc := ds.SystemCalculation{
-		UserID: userId,
+		UserID:      userId,
+		ModeratorID: nil,
 	}
 	createErr := r.db.Create(&newSystemCalc).Error
 	if createErr != nil {
@@ -25,6 +26,14 @@ func (r *Repository) GetSystemCalc(userId uint) (ds.SystemCalculation, error) {
 	}
 	return exist_calc, nil
 
+}
+func (r *Repository) GetSystemCalcById(id uint) (ds.SystemCalculation, error) {
+	var sysCalc ds.SystemCalculation
+	findErr := r.db.Where("id = ? AND status != ?", id, ds.DELETED).First(&sysCalc).Error
+	if findErr != nil {
+		return ds.SystemCalculation{}, findErr
+	}
+	return sysCalc, nil
 }
 
 func (r *Repository) CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, error) {
@@ -93,4 +102,28 @@ func (r *Repository) GetCountComnponents(userId uint) (int, error) {
 	}
 	return len(components), nil
 
+}
+
+func (r *Repository) DeleteComponentFromSystemCalc(sysCalcId uint, componentId uint) error {
+	var deletedComponent ds.Component
+
+	findErr := r.db.Where("system_caclulation_id = ?, component_id = ?", sysCalcId, componentId).First(&deletedComponent).Error
+	if findErr != nil {
+		return findErr
+	}
+	deleteErr := r.db.Delete(deletedComponent).Error
+	if deleteErr != nil {
+		return deleteErr
+	}
+	return nil
+}
+func (r *Repository) DeleteSystemCalc(sysCalcId uint) error {
+	var err error
+	var ids []uint
+	query := "UPDATE system_calculations SET status=$1 WHERE id = $2 AND status!=$1"
+	res := r.db.Raw(query, ds.DELETED, sysCalcId).Scan(&ids)
+	if err = res.Error; err != nil {
+		return err
+	}
+	return nil
 }

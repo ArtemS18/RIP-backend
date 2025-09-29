@@ -16,11 +16,10 @@
 
         </div>
         <div class="page">
-            <h1> Название системы</h1>
-                <div class="form-containeer">
-                    <input type="text" name="name" placeholder="Придумайте название" value="">
-                    <button class="button add"> Сохранить</button>
-                </div>
+            <div>
+                <h1> Расчет доступности системы</h1>
+                <p><span id="available">95.75%</span> <span>от времени использования</span> </p>
+            </div>
             <h1> Составление заявки</h1>
             <div class="component-container">
             {{ range .components}}
@@ -28,7 +27,7 @@
                     <div class="component">
                         <div class="title">
                             <span id="img-icon">
-                                <img src= "http://localhost:9000/failivercheck/svg/{{.Img}}" alt="icon"/>
+                                <img src= "{{.Img}}" alt="icon"/>
                             </span>
                             <span > <a href="/components/{{.ID}}">{{ .Title }}</a></span>
                         </div>
@@ -42,13 +41,18 @@
                     </div>
             {{ end }}
             </div>
-            <div>
-                <h1> Расчет доступности системы</h1>
-                <p><span id="available">95.75%</span> <span>от времени использования</span> </p>
+            <h1> Название системы</h1>
+            <div class="form-containeer">
+                <input type="text" name="name" placeholder="Придумайте название" value="">
+                <button class="button add"> Сохранить</button>
             </div>
             <div class="buttons">
                 <button class="button add"> Создать заявку</button>
-                <button class="button delete"> Удалить заявку</button>
+                <form action="/availability_calc/" method="POST" class="delete-form">
+                    <input type="hidden"  name="system_id" value="{{.systemCalcId}}"/>
+                    <button type="submit"class="button delete"> Удалить заявку</button>
+                 </form>
+                
             </div>
         </div>
     </body>
