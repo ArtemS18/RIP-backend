@@ -8,7 +8,7 @@ import (
 func (r *Repository) GetComponents() ([]ds.Component, error) {
 	var components []ds.Component
 
-	err := r.db.Find(&components).Error
+	err := r.db.Find(&components).Where("is_deleted = ?", false).Error
 	if err != nil {
 		return nil, err
 	}
@@ -21,7 +21,7 @@ func (r *Repository) GetComponents() ([]ds.Component, error) {
 func (r *Repository) GetComponentById(id int) (ds.Component, error) {
 	var component ds.Component
 
-	err := r.db.Where("id = ?", id).First(&component).Error
+	err := r.db.Where("id = ? AND is_deleted = ?", id, false).First(&component).Error
 	if err != nil {
 		return ds.Component{}, err
 	}
@@ -32,7 +32,7 @@ func (r *Repository) GetComponentById(id int) (ds.Component, error) {
 func (r *Repository) GetComponentsByTitle(title string) ([]ds.Component, error) {
 	var components []ds.Component
 
-	err := r.db.Where("title ILIKE ?", "%"+title+"%").Find(&components).Error
+	err := r.db.Where("title ILIKE ? AND is_deleted = ?", "%"+title+"%", false).Find(&components).Error
 
 	if err != nil {
 		return nil, err
