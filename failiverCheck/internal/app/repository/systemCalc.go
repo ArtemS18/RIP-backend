@@ -2,6 +2,7 @@ package repository
 
 import (
 	"failiverCheck/internal/app/ds"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -59,7 +60,7 @@ func (r *Repository) AddComponentInSystemCalc(componentID uint, userId uint) err
 	var existing ds.ComponentsToSystemCalc
 	check := r.db.Where("component_id = ? AND system_calculation_id = ?", componentID, systemCal.ID).First(&existing)
 	if check.Error == nil {
-		return nil
+		return fmt.Errorf("component (id = %d) alredy added in system calculation (id = %d)", componentID, systemCal.ID)
 	}
 	if check.Error != nil && check.Error != gorm.ErrRecordNotFound {
 		return check.Error

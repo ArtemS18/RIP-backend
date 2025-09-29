@@ -26,7 +26,6 @@ func NewApplication(c *config.Config, r *gin.Engine, h *handler.Handler) *Applic
 func (app *Application) RunApplication() {
 	logrus.Println("Server start up")
 	app.Handler.RegisterHandlers(app.Router)
-	app.Handler.RegisterStatic(app.Router, "templates")
 	address := fmt.Sprintf("%s:%d", app.Config.ServiceHost, app.Config.ServicePort)
 	if err := app.Router.Run(address); err != nil {
 		logrus.Fatal(err)

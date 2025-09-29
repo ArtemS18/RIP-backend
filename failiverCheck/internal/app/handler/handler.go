@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"failiverCheck/internal/app/models"
 	"failiverCheck/internal/app/repository"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -19,14 +19,13 @@ func NewHandler(r *repository.Repository) *Handler {
 func (h *Handler) RegisterHandlers(r *gin.Engine) {
 	r.GET("/components", h.GetComponents)
 	r.GET("/components/:id", h.GetComponent)
-	r.GET("/availability_calc/:id", h.GetSystemCalc)
-	r.POST("/components", h.AddComponentInSystemCalc)
-	r.POST("/availability_calc", h.DeleteSystemCalc)
-}
-
-func (h *Handler) RegisterStatic(r *gin.Engine, path string) {
-	r.LoadHTMLGlob(fmt.Sprintf("%s/*", path))
-	r.Static("/static", "./resources")
+	r.PUT("/components/:id", h.UpdateComponent)
+	r.POST("/components/", h.CreateComponent)
+	r.POST("/components/:id/system_calc/", h.AddComponentInSystemCalc)
+	r.DELETE("/components/:id", h.DeleteComponent)
+	// r.GET("/availability_calc/:id", h.GetSystemCalc)
+	// r.POST("/components", h.AddComponentInSystemCalc)
+	// r.POST("/availability_calc", h.DeleteSystemCalc)
 }
 
 func (h *Handler) errorHandler(ctx *gin.Context, errorCode int, err error) {
@@ -34,6 +33,14 @@ func (h *Handler) errorHandler(ctx *gin.Context, errorCode int, err error) {
 	ctx.JSON(errorCode, gin.H{
 		"status":      "error",
 		"description": err.Error(),
+	})
+
+}
+
+func (h *Handler) successHandler(ctx *gin.Context, status int, data interface{}) {
+	ctx.JSON(status, models.OKResponse{
+		Status: "ok",
+		Data:   data,
 	})
 
 }

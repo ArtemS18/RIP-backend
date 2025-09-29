@@ -32,24 +32,6 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
-	var err error
-	strId := ctx.PostForm("component_id")
-	componentId, err := strconv.Atoi(strId)
-	if err != nil {
-		h.errorHandler(ctx, 400, err)
-		return
-	}
-	search := ctx.PostForm("search")
-	err = h.Repository.AddComponentInSystemCalc(uint(componentId), 1)
-	if err != nil {
-		h.errorHandler(ctx, 500, err)
-		return
-	}
-	ctx.Set("search", search)
-	h.GetComponents(ctx)
-}
-
 func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
 	var err error
 	idStr := ctx.Param("id")
