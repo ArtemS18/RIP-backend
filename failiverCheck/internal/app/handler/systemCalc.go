@@ -20,15 +20,15 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 		h.errorHandler(ctx, 404, err)
 		return
 	}
-	components, err := h.Repository.GetComponentsInSystemCalc(uint(systemCalc.ID))
+	componentsInCalc, err := h.Repository.GetComponentsInSystemCalc(uint(systemCalc.ID))
 	if err != nil {
 		h.errorHandler(ctx, 500, err)
 		return
 	}
 
-	ctx.HTML(http.StatusOK, "application.html", gin.H{
-		"components":   components,
-		"systemCalcId": id,
+	ctx.HTML(http.StatusOK, "system_calc.html", gin.H{
+		"components": componentsInCalc,
+		"systemCalc": systemCalc,
 	})
 }
 
@@ -40,14 +40,12 @@ func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 		h.errorHandler(ctx, 400, err)
 		return
 	}
-	search := ctx.PostForm("search")
 	err = h.Repository.AddComponentInSystemCalc(uint(componentId), 1)
 	if err != nil {
 		h.errorHandler(ctx, 500, err)
 		return
 	}
-	ctx.Set("search", search)
-	h.GetComponents(ctx)
+	ctx.Redirect(301, "/components?componentName="+ctx.PostForm("componentName"))
 }
 
 func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
@@ -70,7 +68,7 @@ func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
 		h.errorHandler(ctx, 404, err)
 		return
 	}
-	h.GetSystemCalc(ctx)
+	ctx.Redirect(301, "/components")
 }
 
 func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
@@ -84,6 +82,6 @@ func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
 	if err != nil {
 		h.errorHandler(ctx, 400, err)
 	}
-	h.GetComponents(ctx)
+	ctx.Redirect(301, "/components")
 
 }

@@ -18,7 +18,7 @@
         <div class="page">
             <h1> Компоненты системы</h1>
             <form action="/components" method="GET">
-                <input type="text" name="search" placeholder="Найти компоненты" value="{{ .data.SearchQuery }}">
+                <input type="text" name="componentName" placeholder="Найти компоненты" value="{{ .data.SearchQuery }}">
                 <button class = "button search" type="submit"><strong>Поиск</strong></button>
             </form>
             <div class="component-container">
@@ -31,7 +31,7 @@
                     <div class="buttons">
                         <form action="/components/" method="POST" class="add-form">
                             <input type="hidden" style="height: 0px;" name="component_id" value="{{.ID}}">
-                            <input type="hidden" style="height: 0px;" name="search" value="{{ $.data.SearchQuery }}">
+                            <input type="hidden" style="height: 0px;" name="componentName" value="{{ $.data.SearchQuery }}">
                             <button type="submit"  class="button add">
                                 +Добавить
                             </button>

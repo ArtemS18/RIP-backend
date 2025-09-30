@@ -18,7 +18,11 @@
         <div class="page">
             <div>
                 <h1> Расчет доступности системы</h1>
-                <p><span id="available">95.75%</span> <span>от времени использования</span> </p>
+                {{if .systemCalc.AvailableCalculation}}
+                <p><span id="available">{{.systemCalc.AvailableCalculation}}%</span> <span>от времени использования</span> </p>
+                {{else}}
+                 <h3>Здесь появится расчет вашей системы<h3>
+                {{end}}
             </div>
             <h1> Составление заявки</h1>
             <div class="component-container">
@@ -27,14 +31,14 @@
                     <div class="component">
                         <div class="title">
                             <span id="img-icon">
-                                <img src= "{{.Img}}" alt="icon"/>
+                                <img src= "{{.Component.Img}}" alt="icon"/>
                             </span>
-                            <span > <a href="/components/{{.ID}}">{{ .Title }}</a></span>
+                            <span > <a href="/components/{{.Component.ID}}">{{ .Component.Title }}</a></span>
                         </div>
                         <div class="left-container">
                             <div> 
                                 <div> Кол-во репликаций</div>
-                                <input type="number" name="count" placeholder="" value="1">
+                                <input type="number" name="count" placeholder="" value="{{.ReplicationCount}}">
                             </div>
                             <a href="" class="button delete trash"> <img src="http://localhost:9000/failivercheck/svg/trash.svg"></img></a>
                         </div>
@@ -43,13 +47,13 @@
             </div>
             <h1> Название системы</h1>
             <div class="form-containeer">
-                <input type="text" name="name" placeholder="Придумайте название" value="">
+                <input type="text" placeholder="Придумайте название" value="{{.systemCalc.SystemName}}">
                 <button class="button add"> Сохранить</button>
             </div>
             <div class="buttons">
                 <button class="button add"> Создать заявку</button>
                 <form action="/availability_calc/" method="POST" class="delete-form">
-                    <input type="hidden"  name="system_id" value="{{.systemCalcId}}"/>
+                    <input type="hidden"  name="system_id" value="{{.systemCalc.ID}}"/>
                     <button type="submit"class="button delete"> Удалить заявку</button>
                  </form>
                 

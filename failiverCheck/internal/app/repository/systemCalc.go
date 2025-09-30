@@ -76,19 +76,19 @@ func (r *Repository) AddComponentInSystemCalc(componentID uint, userId uint) err
 	return nil
 }
 
-func (r *Repository) GetComponentsInSystemCalc(systemCalcId uint) ([]ds.Component, error) {
+func (r *Repository) GetComponentsInSystemCalc(systemCalcId uint) ([]ds.ComponentsToSystemCalc, error) {
 	var systemCalc ds.SystemCalculation
 
-	err := r.db.Preload("Components", "is_deleted = ?", false).Where("id = ?", systemCalcId).First(&systemCalc).Error
+	err := r.db.Preload("ComponentsToSystemCalcs.Component", "is_deleted = ?", false).Where("id = ?", systemCalcId).First(&systemCalc).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return systemCalc.Components, nil
+	return systemCalc.ComponentsToSystemCalcs, nil
 }
 
 func (r *Repository) GetCountComnponents(userId uint) (int, error) {
-	var components []ds.Component
+	var components []ds.ComponentsToSystemCalc
 	systemCalc, err := r.GetSystemCalc(userId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

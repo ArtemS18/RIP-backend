@@ -13,7 +13,8 @@ type SystemCalculation struct {
 	DateAcceped          time.Time  `gorm:"default:null"`
 	ModeratorID          *uint      `gorm:"default:null"`
 
-	User       User        `gorm:"foreignKey:UserID"`
-	Moderator  User        `gorm:"foreignKey:ModeratorID"`
-	Components []Component `gorm:"many2many:components_to_system_calcs"`
+	User      User `gorm:"foreignKey:UserID"`
+	Moderator User `gorm:"foreignKey:ModeratorID"`
+	// Components []Component `gorm:"many2many:components_to_system_calcs"`
+	ComponentsToSystemCalcs []ComponentsToSystemCalc `gorm:"foreignKey:SystemCalculationID"`
 }

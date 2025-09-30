@@ -2,7 +2,6 @@ package handler
 
 import (
 	"failiverCheck/internal/app/ds"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,17 +37,7 @@ func (h *Handler) GetComponent(ctx *gin.Context) {
 func (h *Handler) GetComponents(ctx *gin.Context) {
 	var orders []ds.Component
 	var err error
-	var searchQuery string
-	param, ok := ctx.Get("search")
-
-	if !ok {
-		searchQuery = ctx.Query("search")
-	} else {
-		searchQuery, ok = param.(string)
-		if !ok {
-			h.errorHandler(ctx, 400, fmt.Errorf("bad param"))
-		}
-	}
+	searchQuery := ctx.Query("componentName")
 	count, err := h.Repository.GetCountComnponents(1)
 	if err != nil {
 		h.errorHandler(ctx, 500, err)
