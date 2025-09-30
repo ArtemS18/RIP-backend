@@ -2,15 +2,28 @@ package config
 
 import (
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
+type ServerConfig struct {
+	Host string `mapstructure:"host"`
+	Port int    `mapstructure:"port"`
+}
+
+type MinioConfig struct {
+	Host      string `mapstructure:"host"`
+	Port      int    `mapstructure:"port"`
+	AccessKey string `mapstructure:"access_key"`
+	SecretKey string `mapstructure:"secret_key"`
+}
+
 type Config struct {
-	ServiceHost string `mapstructure:"ServiceHost"`
-	ServicePort int    `mapstructure:"ServicePort"`
+	Minio  *MinioConfig  `mapstructure:"minio"`
+	Server *ServerConfig `mapstructure:"server"`
 }
 
 func NewConfig() (*Config, error) {
@@ -30,12 +43,22 @@ func NewConfig() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	newConf := &Config{}
-	err = viper.Unmarshal(newConf)
+	serverConf := &ServerConfig{}
+	minioConf := &MinioConfig{}
+	config := &Config{Server: serverConf, Minio: minioConf}
+
+	err = viper.Unmarshal(config)
 	if err != nil {
 		return nil, err
 	}
+	// err = viper.Unmarshal(minioConf)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	log.Info(config.Minio.AccessKey)
 	log.Info("Config created")
-	return newConf, nil
+	return config, nil
 }

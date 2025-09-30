@@ -4,8 +4,6 @@ import (
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
 	"fmt"
-
-	"gorm.io/gorm/clause"
 )
 
 func (r *Repository) GetComponents() ([]ds.Component, error) {
@@ -15,7 +13,7 @@ func (r *Repository) GetComponents() ([]ds.Component, error) {
 		return nil, err
 	}
 	if len(components) == 0 {
-		return nil, fmt.Errorf("massive is empty")
+		return nil, fmt.Errorf("records not found")
 	}
 	return components, nil
 }
@@ -45,11 +43,11 @@ func (r *Repository) GetComponentsByTitle(title string) ([]ds.Component, error) 
 
 func (r *Repository) UpdateComponentById(id uint, update dto.UpdateComponentDTO) (ds.Component, error) {
 	var component ds.Component
-	err := r.db.Model(&ds.Component{}).Clauses(clause.Returning{}).Where("id = ?", id).Updates(update).Scan(&component).Error
-	if err != nil {
-		return ds.Component{}, err
+	res := r.db.Model(&ds.Component{}).Where("id = ? AND is_deleted = ?", id, false).Updates(update)
+	if res.Error != nil {
+		return ds.Component{}, res.Error
 	}
-	if component.Title == "" {
+	if res.RowsAffected == 0 {
 		return ds.Component{}, fmt.Errorf("record not found")
 	}
 	return component, nil
@@ -76,14 +74,11 @@ func (r *Repository) CreateComponent(create dto.CreateComponentDTO) (ds.Componen
 
 func (r *Repository) DeletedComponentById(id uint) error {
 	var component ds.Component
-	err := r.db.Model(&component).Clauses(clause.Returning{
-		Columns: []clause.Column{
-			{Name: "title"},
-		}}).Where("id = ?", id).Update("is_deleted", true).Error
-	if err != nil {
-		return err
+	res := r.db.Model(&component).Where("id = ? AND is_deleted = ?", id, false).Update("is_deleted", true)
+	if res.Error != nil {
+		return res.Error
 	}
-	if component.Title == "" {
+	if res.RowsAffected == 0 {
 		return fmt.Errorf("record not found")
 	}
 	return nil

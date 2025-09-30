@@ -9,10 +9,8 @@ import (
 )
 
 func (h *Handler) GetSystemCalc(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		h.errorHandler(ctx, 400, err)
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
 	systemCalc, err := h.Repository.GetSystemCalcById(uint(id))
@@ -34,10 +32,8 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 
 func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
 	var err error
-	idStr := ctx.Param("id")
-	sysCalcId, err := strconv.Atoi(idStr)
-	if err != nil {
-		h.errorHandler(ctx, 400, err)
+	sysCalcId := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
 	strId := ctx.PostForm("component_id")

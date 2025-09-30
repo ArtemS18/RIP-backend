@@ -14,10 +14,8 @@ import (
 )
 
 func (h *Handler) GetComponent(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invaid param id=%s", idStr))
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
 	log.Info(id)
@@ -53,10 +51,8 @@ func (h *Handler) GetComponents(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateComponent(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invaid param id=%s", idStr))
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
 	var update dto.UpdateComponentDTO
@@ -94,14 +90,12 @@ func (h *Handler) CreateComponent(ctx *gin.Context) {
 }
 
 func (h *Handler) DeleteComponent(ctx *gin.Context) {
-	idStr := ctx.Param("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invaid param id=%s", idStr))
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
 
-	if err = h.Repository.DeletedComponentById(uint(id)); err != nil {
+	if err := h.Repository.DeletedComponentById(uint(id)); err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
 	}
@@ -110,17 +104,37 @@ func (h *Handler) DeleteComponent(ctx *gin.Context) {
 
 func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 	var err error
-	strId := ctx.Param("id")
-	var userId uint = 1
-	componentId, err := strconv.Atoi(strId)
-	if err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invaid param id=%s", strId))
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
-	err = h.Repository.AddComponentInSystemCalc(uint(componentId), userId)
+	var userId uint = 1
+	err = h.Repository.AddComponentInSystemCalc(uint(id), userId)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
 	}
 	ctx.Status(http.StatusNoContent)
+}
+
+func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
+	contentType := ctx.Request.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	contentLengthStr := ctx.Request.Header.Get("Content-Length")
+	if contentLengthStr == "" {
+		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("content-Length header is required"))
+		return
+	}
+	fileSize, err := strconv.ParseInt(contentLengthStr, 10, 64)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid Content-Length header"))
+		return
+	}
+	_, err = h.Repository.UploadComponentImg(ctx, ctx.Request.Body, fileSize, contentType)
+	if err != nil {
+		h.errorHandler(ctx, 500, err)
+		return
+	}
 }

@@ -23,7 +23,7 @@ func main() {
 	}
 	dsnPg := dsn.LoadEnv()
 	fmt.Println(dsnPg)
-	repo, errRep := repository.NewRepository(dsnPg)
+	repo, errRep := repository.NewRepository(dsnPg, config)
 	if errRep != nil {
 		logrus.Fatalf("error initializing repository: %v", errRep)
 	}
