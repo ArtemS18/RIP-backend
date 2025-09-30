@@ -7,7 +7,6 @@ import (
 
 func (r *Repository) GetComponents() ([]ds.Component, error) {
 	var components []ds.Component
-
 	err := r.db.Where("is_deleted = ?", false).Find(&components).Error
 	if err != nil {
 		return nil, err
