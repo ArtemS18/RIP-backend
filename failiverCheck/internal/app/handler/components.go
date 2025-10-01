@@ -132,9 +132,16 @@ func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
 		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid Content-Length header"))
 		return
 	}
-	_, err = h.Repository.UploadComponentImg(ctx, ctx.Request.Body, fileSize, contentType)
+	location, err := h.Repository.UploadComponentImg(ctx, dto.ComponentImgCreateDTO{
+		File:        ctx.Request.Body,
+		FilePath:    "img/",
+		FileSize:    fileSize,
+		ContentType: contentType,
+	})
 	if err != nil {
-		h.errorHandler(ctx, 500, err)
+		h.errorHandler(ctx, 404, err)
 		return
 	}
+	h
+	.successHandler(ctx, 200, map[string]string{"location": location})
 }

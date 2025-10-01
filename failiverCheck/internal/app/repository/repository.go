@@ -22,7 +22,7 @@ func NewRepository(dsn string, config *config.Config) (*Repository, error) {
 		return nil, err
 	}
 	logrus.Info(config.Minio.Host)
-	minio, err := NewMinio(config, "failivercheck")
+	minio, err := NewMinio(config)
 	if err != nil {
 		return nil, err
 	}

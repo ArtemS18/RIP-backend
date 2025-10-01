@@ -11,10 +11,10 @@ import (
 
 type Minio struct {
 	Client *minio.Client
-	Bucket string
+	Config *config.MinioConfig
 }
 
-func NewMinio(config *config.Config, bucket string) (*Minio, error) {
+func NewMinio(config *config.Config) (*Minio, error) {
 	endpoint := fmt.Sprintf("%s:%d", config.Minio.Host, config.Minio.Port)
 	fmt.Println(endpoint)
 	client, err := minio.New(endpoint, &minio.Options{
@@ -25,6 +25,6 @@ func NewMinio(config *config.Config, bucket string) (*Minio, error) {
 		logrus.Error(err.Error())
 		return nil, err
 	}
-	return &Minio{Client: client, Bucket: bucket}, nil
+	return &Minio{Client: client, Config: config.Minio}, nil
 
 }
