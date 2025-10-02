@@ -55,6 +55,9 @@ func (r *Repository) UpdateComponentById(id uint, update dto.UpdateComponentDTO)
 
 func (r *Repository) CreateComponent(create dto.CreateComponentDTO) (ds.Component, error) {
 
+	if create.MTBF <= 0 || create.MTTR <= 0 {
+		return ds.Component{}, fmt.Errorf("mtbf and mttr shouldn`t be least nil")
+	}
 	availableCalc := float32(create.MTBF) / float32(create.MTTR+create.MTBF)
 
 	component := ds.Component{

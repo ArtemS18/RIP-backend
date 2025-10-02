@@ -3,19 +3,19 @@ package ds
 import "time"
 
 type SystemCalculation struct {
-	ID                   uint      `gorm:"autoIncrement; primaryKey"`
-	SystemName           string    `gorm:"size:256; defaul:null"`
-	AvailableCalculation float32   `gorm:"defaul:null"`
-	UserID               uint      `gorm:"not null"`
-	Status               string    `gorm:"size:256; default:DRAFT; not null"`
-	DateCreated          time.Time `gorm:"autoCreateTime; not null"`
-	DateFormed           time.Time `gorm:"default:null"`
-	DateAcceped          time.Time `gorm:"default:null"`
-	ModeratorID          *uint
+	ID                   uint       `gorm:"autoIncrement; primaryKey" json:"id"`
+	SystemName           *string    `gorm:"size:256; defaul:null" json:"system_name"`
+	AvailableCalculation float32    `gorm:"defaul:null" json:"available_calculation"`
+	UserID               uint       `gorm:"not null" json:"-"`
+	Status               string     `gorm:"size:256; default:DRAFT; not null" json:"status"`
+	DateCreated          time.Time  `gorm:"autoCreateTime; not null" json:"date_created"`
+	DateFormed           *time.Time `gorm:"default:null" json:"date_formed"`
+	DateClosed           *time.Time `gorm:"default:null" json:"date_accepted"`
+	ModeratorID          *uint      `json:"-"`
 
-	User       User        `gorm:"foreignKey:UserID"`
-	Moderator  User        `gorm:"foreignKey:ModeratorID"`
-	Components []Component `gorm:"many2many:components_to_system_calcs"`
+	User                   User                     `gorm:"foreignKey:UserID" json:"user"`
+	Moderator              *User                    `gorm:"foreignKey:ModeratorID" json:"moderator"`
+	ComponentsToSystemCalc []ComponentsToSystemCalc `gorm:"foreignKey:SystemCalculationID" json:"components"`
 }
 
 type Status string

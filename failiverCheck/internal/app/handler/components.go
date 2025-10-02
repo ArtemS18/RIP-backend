@@ -4,12 +4,11 @@ import (
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/models"
-	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -94,9 +93,19 @@ func (h *Handler) DeleteComponent(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
+	component, err := h.Repository.GetComponentById(id)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusNotFound, err)
+		return
+	}
+	imgUrl := component.Img
 
 	if err := h.Repository.DeletedComponentById(uint(id)); err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
+		return
+	}
+	if err := h.Repository.DeleteComponentImg(ctx, &imgUrl); err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
 	ctx.Status(http.StatusNoContent)
@@ -118,18 +127,12 @@ func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
-	contentType := ctx.Request.Header.Get("Content-Type")
-	if contentType == "" {
-		contentType = "application/octet-stream"
-	}
-	contentLengthStr := ctx.Request.Header.Get("Content-Length")
-	if contentLengthStr == "" {
-		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("content-Length header is required"))
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
 		return
 	}
-	fileSize, err := strconv.ParseInt(contentLengthStr, 10, 64)
-	if err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, fmt.Errorf("invalid Content-Length header"))
+	contentType, fileSize := h.getFileHeaders(ctx)
+	if ctx.IsAborted() {
 		return
 	}
 	location, err := h.Repository.UploadComponentImg(ctx, dto.ComponentImgCreateDTO{
@@ -138,10 +141,21 @@ func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
 		FileSize:    fileSize,
 		ContentType: contentType,
 	})
+	logrus.Info(location)
 	if err != nil {
 		h.errorHandler(ctx, 404, err)
 		return
 	}
-	h
-	.successHandler(ctx, 200, map[string]string{"location": location})
+	component, err := h.Repository.GetComponentById(id)
+	if err != nil {
+		h.errorHandler(ctx, 404, err)
+		return
+	}
+	if component.Img != "" {
+		if err = h.Repository.DeleteComponentImg(ctx, &component.Img); err != nil {
+			logrus.Error(err)
+		}
+	}
+	h.Repository.UpdateComponentById(uint(id), dto.UpdateComponentDTO{Img: &location})
+	h.successHandler(ctx, 200, map[string]string{"img_url": location})
 }

@@ -17,3 +17,12 @@ type UpdateComponentDTO struct {
 	Img         *string  `json:"img"`
 	Description *string  `json:"description"`
 }
+type ComponentDTO struct {
+	ID    uint32 `json:"id"`
+	Title string `json:"title"`
+}
+
+type ComponentsToSystemCalcDTO struct {
+	ReplicationCount uint         `json:"replication_count"`
+	Component        ComponentDTO `json:"component"`
+}
