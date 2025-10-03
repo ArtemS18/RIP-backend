@@ -38,3 +38,44 @@ type SystemCalculationDTO struct {
 	Moderator              *UserDTO                    `json:"moderator"`
 	ComponentsToSystemCalc []ComponentsToSystemCalcDTO `json:"components"`
 }
+
+func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
+	moderator := ToUserDTO(*orm.Moderator)
+	var componentsToSystemCalc []ComponentsToSystemCalcDTO
+	for _, el := range orm.ComponentsToSystemCalc {
+		componentsToSystemCalc = append(componentsToSystemCalc, ToComponentsToSystemCalcDTO(el))
+	}
+	dto := SystemCalculationDTO{
+		ID:                     orm.ID,
+		SystemName:             orm.SystemName,
+		AvailableCalculation:   orm.AvailableCalculation,
+		Status:                 orm.Status,
+		DateCreated:            orm.DateCreated,
+		DateFormed:             orm.DateFormed,
+		DateClosed:             orm.DateClosed,
+		User:                   ToUserDTO(orm.User),
+		Moderator:              &moderator,
+		ComponentsToSystemCalc: componentsToSystemCalc,
+	}
+	return dto
+}
+
+func ToSystemCalculationListDTO(arr []ds.SystemCalculation) []SystemCalculationDTO {
+	list := make([]SystemCalculationDTO, len(arr))
+	for _, el := range arr {
+		val := ToSystemCalculationDTO(el)
+		list = append(list, val)
+	}
+	return list
+}
+
+type ComponentToSystemCalcByIdDTO struct {
+	ComponentID         uint `json:"component_id"`
+	SystemCalculationID uint `json:"system_calculation_id"`
+}
+
+type UpdateComponentToSystemCalcDTO struct {
+	ComponentID         uint `json:"component_id"`
+	SystemCalculationID uint `json:"system_calculation_id"`
+	ReplicationCount    uint `json:"replication_count"`
+}

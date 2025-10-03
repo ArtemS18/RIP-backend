@@ -4,10 +4,8 @@ import (
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/models"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 func (h *Handler) GetSystemCalc(ctx *gin.Context) {
@@ -16,12 +14,13 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 		return
 	}
 	systemCalc, err := h.Repository.GetSystemCalcById(uint(id))
+	sysCalcsResp := dto.ToSystemCalculationDTO(systemCalc)
 	if err != nil {
 		h.errorHandler(ctx, 404, err)
 		return
 	}
 
-	h.successHandler(ctx, 200, systemCalc)
+	h.successHandler(ctx, 200, sysCalcsResp)
 }
 func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 	var filters dto.SystemCalcFilters
@@ -30,48 +29,34 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 		return
 	}
 	sysCalcs, err := h.Repository.GetSystemCalcList(filters)
+	sysCalcsResp := dto.ToSystemCalculationListDTO(sysCalcs)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
 	}
-	h.successHandler(ctx, http.StatusOK, sysCalcs)
-}
-func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
-	var err error
-	sysCalcId := h.getIntParam(ctx, "id")
-	if ctx.IsAborted() {
-		return
-	}
-	strId := ctx.PostForm("component_id")
-	componentId, err := strconv.Atoi(strId)
-	if err != nil {
-		h.errorHandler(ctx, 400, err)
-		return
-	}
-
-	err = h.Repository.DeleteComponentFromSystemCalc(uint(sysCalcId), uint(componentId))
-	if err != nil {
-		h.errorHandler(ctx, 404, err)
-		return
-	}
-	h.successHandler(ctx, 204, nil)
+	h.successHandler(ctx, http.StatusOK, sysCalcsResp)
 }
 
-func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
-	idStr := ctx.PostForm("system_id")
-	sysCalcId, err := strconv.Atoi(idStr)
-	if err != nil {
-		h.errorHandler(ctx, 400, err)
-		return
-	}
-	logrus.Info(idStr)
-	err = h.Repository.DeleteSystemCalc(uint(sysCalcId))
-	if err != nil {
-		h.errorHandler(ctx, 400, err)
-		return
-	}
-	h.successHandler(ctx, 204, nil)
-}
+// func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
+// 	var err error
+// 	sysCalcId := h.getIntParam(ctx, "id")
+// 	if ctx.IsAborted() {
+// 		return
+// 	}
+// 	strId := ctx.PostForm("component_id")
+// 	componentId, err := strconv.Atoi(strId)
+// 	if err != nil {
+// 		h.errorHandler(ctx, 400, err)
+// 		return
+// 	}
+
+// 	err = h.Repository.DeleteComponentFromSystemCalc(uint(sysCalcId), uint(componentId))
+// 	if err != nil {
+// 		h.errorHandler(ctx, 404, err)
+// 		return
+// 	}
+// 	h.successHandler(ctx, 204, nil)
+// }
 
 func (h *Handler) GetSystemCalcBucket(ctx *gin.Context) {
 	userId := uint(1)
@@ -127,6 +112,19 @@ func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
 	}
 
 	err := h.Repository.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, data.Command)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
+	}
+	h.successHandler(ctx, 204, nil)
+}
+
+func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
+	sysCalcId := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
+		return
+	}
+	err := h.Repository.DeleteSystemCalc(uint(sysCalcId))
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return

@@ -49,7 +49,6 @@ func (r *Repository) CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, e
 			return ds.SystemCalculation{}, findErr
 		}
 	}
-
 	return exist_calc, nil
 
 }
@@ -100,28 +99,20 @@ func (r *Repository) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBuck
 
 }
 
-func (r *Repository) DeleteComponentFromSystemCalc(sysCalcId uint, componentId uint) error {
-	var deletedComponent ds.Component
-
-	findErr := r.db.Where("system_caclulation_id = ?, component_id = ?", sysCalcId, componentId).First(&deletedComponent).Error
-	if findErr != nil {
-		return findErr
-	}
-	deleteErr := r.db.Delete(deletedComponent).Error
-	if deleteErr != nil {
-		return deleteErr
-	}
-	return nil
-}
 func (r *Repository) DeleteSystemCalc(sysCalcId uint) error {
-	var err error
-	var ids []uint
-	query := "UPDATE system_calculations SET status=$1 WHERE id = $2 AND status!=$1"
-	res := r.db.Raw(query, ds.DELETED, sysCalcId).Scan(&ids)
-	if err = res.Error; err != nil {
-		return err
+	date := time.Now()
+	res := r.db.Model(ds.SystemCalculation{}).Where(
+		"id = ? AND status <> ?", sysCalcId, ds.DELETED).Updates(
+		ds.SystemCalculation{
+			Status:     string(ds.DELETED),
+			DateFormed: &date,
+		},
+	)
+	if res.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
 	}
-	return nil
+
+	return res.Error
 }
 func (r *Repository) GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.SystemCalculation, error) {
 	var sys_cacls []ds.SystemCalculation
