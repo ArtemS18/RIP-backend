@@ -41,7 +41,7 @@ func (h *Handler) RegisterHandlers(e *gin.Engine) {
 	users := api.Group("/users", AuthMiddleware())
 	users.POST("/register", h.RegisterUser)
 	users.POST("/auth", h.AuthUser)
-	users.GET("/me", AuthMiddleware(), h.GetUser)
+	users.GET("/me", h.GetUser)
 	users.POST("/loguout", h.LogoutUser)
 	// r.GET("/availability_calc/:id", h.GetSystemCalc)
 	// r.POST("/components", h.AddComponentInSystemCalc)
