@@ -17,12 +17,18 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 	}
 	systemCalc, err := h.Repository.GetSystemCalcById(uint(id))
 	if err != nil {
-		h.errorHandler(ctx, 404, err)
+		ctx.HTML(http.StatusOK, "system_calc.html", gin.H{
+			"components": nil,
+			"systemCalc": nil,
+		})
 		return
 	}
 	componentsInCalc, err := h.Repository.GetComponentsInSystemCalc(uint(systemCalc.ID))
 	if err != nil {
-		h.errorHandler(ctx, 500, err)
+		ctx.HTML(http.StatusOK, "system_calc.html", gin.H{
+			"components": nil,
+			"systemCalc": nil,
+		})
 		return
 	}
 
