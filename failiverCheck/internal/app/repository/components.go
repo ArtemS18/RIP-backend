@@ -4,6 +4,8 @@ import (
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
 	"fmt"
+
+	"gorm.io/gorm/clause"
 )
 
 func (r *Repository) GetComponents() ([]ds.Component, error) {
@@ -43,7 +45,7 @@ func (r *Repository) GetComponentsByTitle(title string) ([]ds.Component, error) 
 
 func (r *Repository) UpdateComponentById(id uint, update dto.UpdateComponentDTO) (ds.Component, error) {
 	var component ds.Component
-	res := r.db.Model(&ds.Component{}).Where("id = ? AND is_deleted = ?", id, false).Updates(update)
+	res := r.db.Model(&component).Clauses(clause.Returning{}).Where("id = ? AND is_deleted = ?", id, false).Updates(update)
 	if res.Error != nil {
 		return ds.Component{}, res.Error
 	}

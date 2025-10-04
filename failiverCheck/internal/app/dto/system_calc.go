@@ -40,7 +40,11 @@ type SystemCalculationDTO struct {
 }
 
 func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
-	moderator := ToUserDTO(*orm.Moderator)
+	var moderator *UserDTO = nil
+	if orm.Moderator != nil {
+		ptr := ToUserDTO(*orm.Moderator)
+		moderator = &ptr
+	}
 	var componentsToSystemCalc []ComponentsToSystemCalcDTO
 	for _, el := range orm.ComponentsToSystemCalc {
 		componentsToSystemCalc = append(componentsToSystemCalc, ToComponentsToSystemCalcDTO(el))
@@ -54,7 +58,7 @@ func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
 		DateFormed:             orm.DateFormed,
 		DateClosed:             orm.DateClosed,
 		User:                   ToUserDTO(orm.User),
-		Moderator:              &moderator,
+		Moderator:              moderator,
 		ComponentsToSystemCalc: componentsToSystemCalc,
 	}
 	return dto
@@ -70,8 +74,8 @@ func ToSystemCalculationListDTO(arr []ds.SystemCalculation) []SystemCalculationD
 }
 
 type ComponentToSystemCalcByIdDTO struct {
-	ComponentID         uint `json:"component_id"`
-	SystemCalculationID uint `json:"system_calculation_id"`
+	ComponentID         uint `json:"component_id" validate:"required"`
+	SystemCalculationID uint `json:"system_calculation_id" validate:"required"`
 }
 
 type UpdateComponentToSystemCalcDTO struct {

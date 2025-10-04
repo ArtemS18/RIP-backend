@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"failiverCheck/internal/app/models"
+	"failiverCheck/internal/app/schemas"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,7 @@ func (h *Handler) errorHandler(ctx *gin.Context, errorCode int, err error) {
 }
 
 func (h *Handler) successHandler(ctx *gin.Context, status int, data interface{}) {
-	ctx.JSON(status, models.OKResponse{
+	ctx.JSON(status, schemas.OKResponse{
 		Status: "ok",
 		Data:   data,
 	})
@@ -55,4 +56,17 @@ func (h *Handler) getFileHeaders(ctx *gin.Context) (string, int64) {
 		return "", 0
 	}
 	return contentType, fileSize
+}
+
+func (h *Handler) validateFields(ctx *gin.Context, obj any) {
+	if err := ctx.BindJSON(obj); err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		ctx.Abort()
+
+	}
+	validate := validator.New()
+	if err := validate.Struct(obj); err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		ctx.Abort()
+	}
 }

@@ -3,12 +3,10 @@ package handler
 import (
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
-	"failiverCheck/internal/app/models"
+	"failiverCheck/internal/app/schemas"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -46,7 +44,7 @@ func (h *Handler) GetComponents(ctx *gin.Context) {
 			return
 		}
 	}
-	h.successHandler(ctx, http.StatusOK, models.ComponentsRes{Components: components})
+	h.successHandler(ctx, http.StatusOK, schemas.ComponentsRes{Components: components})
 }
 
 func (h *Handler) UpdateComponent(ctx *gin.Context) {
@@ -70,13 +68,8 @@ func (h *Handler) UpdateComponent(ctx *gin.Context) {
 
 func (h *Handler) CreateComponent(ctx *gin.Context) {
 	var create dto.CreateComponentDTO
-	if err := ctx.BindJSON(&create); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
-		return
-	}
-	validate := validator.New()
-	if err := validate.Struct(create); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
+	h.validateFields(ctx, &create)
+	if ctx.IsAborted() {
 		return
 	}
 	component, err := h.Repository.CreateComponent(create)
@@ -113,11 +106,14 @@ func (h *Handler) DeleteComponent(ctx *gin.Context) {
 
 func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 	var err error
+	var userId uint = h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
 	id := h.getIntParam(ctx, "id")
 	if ctx.IsAborted() {
 		return
 	}
-	var userId uint = 1
 	err = h.Repository.AddComponentInSystemCalc(uint(id), userId)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
@@ -141,7 +137,7 @@ func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
 		FileSize:    fileSize,
 		ContentType: contentType,
 	})
-	logrus.Info(location)
+	log.Info(location)
 	if err != nil {
 		h.errorHandler(ctx, 404, err)
 		return
@@ -153,7 +149,7 @@ func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
 	}
 	if component.Img != "" {
 		if err = h.Repository.DeleteComponentImg(ctx, &component.Img); err != nil {
-			logrus.Error(err)
+			log.Error(err)
 		}
 	}
 	h.Repository.UpdateComponentById(uint(id), dto.UpdateComponentDTO{Img: &location})

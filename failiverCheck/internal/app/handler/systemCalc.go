@@ -2,7 +2,7 @@ package handler
 
 import (
 	"failiverCheck/internal/app/dto"
-	"failiverCheck/internal/app/models"
+	"failiverCheck/internal/app/schemas"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,29 +37,11 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 	h.successHandler(ctx, http.StatusOK, sysCalcsResp)
 }
 
-// func (h *Handler) DeleteComponentFromSystemCalc(ctx *gin.Context) {
-// 	var err error
-// 	sysCalcId := h.getIntParam(ctx, "id")
-// 	if ctx.IsAborted() {
-// 		return
-// 	}
-// 	strId := ctx.PostForm("component_id")
-// 	componentId, err := strconv.Atoi(strId)
-// 	if err != nil {
-// 		h.errorHandler(ctx, 400, err)
-// 		return
-// 	}
-
-// 	err = h.Repository.DeleteComponentFromSystemCalc(uint(sysCalcId), uint(componentId))
-// 	if err != nil {
-// 		h.errorHandler(ctx, 404, err)
-// 		return
-// 	}
-// 	h.successHandler(ctx, 204, nil)
-// }
-
 func (h *Handler) GetSystemCalcBucket(ctx *gin.Context) {
-	userId := uint(1)
+	var userId uint = h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
 	bucket, err := h.Repository.GetCurrentSysCalcAndCount(userId)
 	if err != nil {
 		h.errorHandler(ctx, 400, err)
@@ -73,17 +55,18 @@ func (h *Handler) UpdateSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	var data models.UpdateSystemCalcFields
-	if err := ctx.ShouldBindJSON(&data); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
+	var data schemas.UpdateSystemCalcFields
+	h.validateFields(ctx, &data)
+	if ctx.IsAborted() {
 		return
 	}
-	err := h.Repository.UpdateSystemCalc(uint(sysCalcId), dto.UpdateSystemCalcDTO{SystemName: data.SystemName})
+	system, err := h.Repository.UpdateSystemCalc(uint(sysCalcId), dto.UpdateSystemCalcDTO{SystemName: data.SystemName})
+	systemDto := dto.ToSystemCalculationDTO(system)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	h.successHandler(ctx, 204, nil)
+	h.successHandler(ctx, 200, systemDto)
 }
 
 func (h *Handler) UpdateSystemCalcStatusToFormed(ctx *gin.Context) {
@@ -91,12 +74,13 @@ func (h *Handler) UpdateSystemCalcStatusToFormed(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	err := h.Repository.UpdateSystemCalcStatusToFormed(uint(sysCalcId))
+	system, err := h.Repository.UpdateSystemCalcStatusToFormed(uint(sysCalcId))
+	dto := dto.ToSystemCalculationDTO(system)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	h.successHandler(ctx, 204, nil)
+	h.successHandler(ctx, 200, dto)
 }
 
 func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
@@ -105,18 +89,18 @@ func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	var data models.UpdateSystemCalcStatus
-	if err := ctx.ShouldBindJSON(&data); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
+	var data schemas.UpdateSystemCalcStatus
+	h.validateFields(ctx, &data)
+	if ctx.IsAborted() {
 		return
 	}
-
-	err := h.Repository.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, data.Command)
+	system, err := h.Repository.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, data.Command)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	h.successHandler(ctx, 204, nil)
+	dto := dto.ToSystemCalculationDTO(system)
+	h.successHandler(ctx, 200, dto)
 }
 
 func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {

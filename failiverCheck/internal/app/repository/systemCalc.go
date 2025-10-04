@@ -89,7 +89,7 @@ func (r *Repository) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBuck
 		return dto, err
 	}
 	var count int64
-	err = r.db.Model(&ds.ComponentsToSystemCalc{}).Where("system_caclulation_id = ?", systemCalc.ID).Count(&count).Error
+	err = r.db.Model(&ds.ComponentsToSystemCalc{}).Where("system_calculation_id = ?", systemCalc.ID).Count(&count).Error
 	if err != nil {
 		return dto, err
 	}
@@ -154,22 +154,29 @@ func (r *Repository) GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.Syst
 	return sys_cacls, nil
 }
 
-func (r *Repository) UpdateSystemCalc(id uint, dto dto.UpdateSystemCalcDTO) error {
-	res := r.db.Model(&ds.SystemCalculation{}).Where("id = ? AND status != ?", id, ds.DELETED).Updates(dto)
+func (r *Repository) UpdateSystemCalc(id uint, dto dto.UpdateSystemCalcDTO) (ds.SystemCalculation, error) {
+	var system ds.SystemCalculation
+	res := r.db.Model(&system).Where("id = ? AND status != ?", id, ds.DELETED).Updates(dto)
 	if res.RowsAffected == 0 {
-		return gorm.ErrRecordNotFound
+		return ds.SystemCalculation{}, gorm.ErrRecordNotFound
 	}
 	if res.Error != nil {
-		return res.Error
+		return ds.SystemCalculation{}, res.Error
 	}
-	return nil
 
+	var updatedSystem ds.SystemCalculation
+	findErr := r.db.Preload("Moderator").Preload("User").First(&updatedSystem, id).Error
+	if findErr != nil {
+		return ds.SystemCalculation{}, findErr
+	}
+
+	return updatedSystem, nil
 }
-func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) error {
+func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error) {
 	var sys_cacl ds.SystemCalculation
 	err := r.db.Preload("ComponentsToSystemCalc.Component").Where("id = ? AND status = ?", sysCaclId, ds.FORMED).First(&sys_cacl).Error
 	if err != nil {
-		return err
+		return sys_cacl, err
 	}
 	var status ds.Status
 	var available float32
@@ -177,13 +184,13 @@ func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId
 	case "confirm":
 		available, err = calculateAvailable(&sys_cacl)
 		if err != nil {
-			return err
+			return sys_cacl, err
 		}
 		status = ds.COMPLETED
 	case "reject":
 		status = ds.REJECTED
 	default:
-		return fmt.Errorf("invalide command: %v", command)
+		return sys_cacl, fmt.Errorf("invalide command: %v", command)
 	}
 	timeClosed := time.Now()
 	dto := dto.UpdateSystemCalcDTO{Status: &status, DateClosed: &timeClosed, ModeratorId: &moderatorId}
@@ -194,18 +201,19 @@ func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId
 
 }
 
-func (r *Repository) UpdateSystemCalcStatusToFormed(id uint) error {
+func (r *Repository) UpdateSystemCalcStatusToFormed(id uint) (ds.SystemCalculation, error) {
 	sys_cacl, err := r.GetSystemCalcById(id)
 	if err != nil {
-		return err
+		return sys_cacl, err
 	}
 	if sys_cacl.Status != string(ds.DRAFT) {
-		return fmt.Errorf("current sys calc`s status should be the %v", ds.DRAFT)
+		return sys_cacl, fmt.Errorf("current sys calc`s status should be the %v", ds.DRAFT)
 	}
 	if sys_cacl.SystemName == nil || *sys_cacl.SystemName == "" {
-		return fmt.Errorf("system_name should be not null")
+		return sys_cacl, fmt.Errorf("system_name should be not null")
 	}
 	dateFormed := time.Now()
 	status := ds.FORMED
+
 	return r.UpdateSystemCalc(id, dto.UpdateSystemCalcDTO{Status: &status, DateFormed: &dateFormed})
 }

@@ -9,16 +9,11 @@ import (
 )
 
 func (h *Handler) UpdateComponentsToSystemCac(ctx *gin.Context) {
-	//validate := validator.New()
 	var update dto.UpdateComponentToSystemCalcDTO
-	if err := ctx.BindJSON(&update); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
+	h.validateFields(ctx, &update)
+	if ctx.IsAborted() {
 		return
 	}
-	// if err := validate.Struct(update); err != nil {
-	// 	h.errorHandler(ctx, http.StatusBadRequest, err)
-	// 	return
-	// }
 	orm, err := h.Repository.UpdateComponentsToSystemCalc(update)
 	new := dto.ToComponentsToSystemCalcDTO(orm)
 	if err != nil {

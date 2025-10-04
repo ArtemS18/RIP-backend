@@ -1,4 +1,4 @@
-package models
+package schemas
 
 import (
 	"failiverCheck/internal/app/ds"
