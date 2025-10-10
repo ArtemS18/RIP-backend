@@ -13,9 +13,9 @@ import (
 
 func (h *Handler) errorHandler(ctx *gin.Context, errorCode int, err error) {
 	log.Error(err.Error())
-	ctx.JSON(errorCode, gin.H{
-		"status":      "error",
-		"description": err.Error(),
+	ctx.JSON(errorCode, schemas.Error{
+		Status:      "error",
+		Description: err.Error(),
 	})
 	ctx.Abort()
 

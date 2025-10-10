@@ -10,6 +10,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Show a component by id
+// @Summary       Show a component by id
+// @Description   Show a component by id
+// @Tags         Components
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "Component ID"
+// @Success      200  {object}  ds.Component
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /components/{id} [get]
 func (h *Handler) GetComponent(ctx *gin.Context) {
 	id := h.getIntParam(ctx, "id")
 	if ctx.IsAborted() {
@@ -25,6 +37,17 @@ func (h *Handler) GetComponent(ctx *gin.Context) {
 	h.successHandler(ctx, http.StatusOK, component)
 }
 
+// Show a components list
+// @Summary       Show a components list
+// @Description   Show a components list
+// @Tags         Components
+// @Accept       json
+// @Produce      json
+// @Success      200  {array}  ds.Component
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /components/ [get]
 func (h *Handler) GetComponents(ctx *gin.Context) {
 	var components []ds.Component
 	var err error
@@ -47,6 +70,19 @@ func (h *Handler) GetComponents(ctx *gin.Context) {
 	h.successHandler(ctx, http.StatusOK, schemas.ComponentsRes{Components: components})
 }
 
+// Update a component by id
+// @Summary       Show a component by id
+// @Description   Show a component by id
+// @Tags         Components
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "Component ID"
+// @Param  update body dto.UpdateComponentDTO true "Update component schema"
+// @Success      200  {object}  ds.Component
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /components/{id} [get]
 func (h *Handler) UpdateComponent(ctx *gin.Context) {
 	id := h.getIntParam(ctx, "id")
 	if ctx.IsAborted() {
@@ -66,6 +102,18 @@ func (h *Handler) UpdateComponent(ctx *gin.Context) {
 	h.successHandler(ctx, http.StatusOK, component)
 }
 
+// Create a component
+// @Summary       Create a component
+// @Description   Create a component
+// @Tags         Components
+// @Accept       json
+// @Produce      json
+// @Param  create body dto.CreateComponentDTO true "Create component schema"
+// @Success      200  {object}  ds.Component
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /components/ [post]
 func (h *Handler) CreateComponent(ctx *gin.Context) {
 	var create dto.CreateComponentDTO
 	h.validateFields(ctx, &create)
@@ -81,6 +129,18 @@ func (h *Handler) CreateComponent(ctx *gin.Context) {
 	h.successHandler(ctx, http.StatusOK, component)
 }
 
+// Delete a component by id
+// @Summary       Delete a component by id
+// @Description   Delete a component by id
+// @Tags         Components
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "Component ID"
+// @Success      204  {object}  nil
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /components/{id} [delete]
 func (h *Handler) DeleteComponent(ctx *gin.Context) {
 	id := h.getIntParam(ctx, "id")
 	if ctx.IsAborted() {
@@ -104,6 +164,18 @@ func (h *Handler) DeleteComponent(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
+// Add component in system caclulation
+// @Summary       Add component in system caclulation
+// @Description   Add component in system caclulation
+// @Tags         Components
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "Component ID"
+// @Success      204  {object}  nil
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /components/{id}/system_calc/ [post]
 func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 	var err error
 	var userId uint = h.GetUserID(ctx)
