@@ -2,6 +2,7 @@ package repository
 
 import (
 	"failiverCheck/internal/app/ds"
+	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
 	"fmt"
 
@@ -55,5 +56,31 @@ func (r *Repository) GetUserById(userId uint) (ds.User, error) {
 	if err != nil {
 		return ds.User{}, err
 	}
+	return user, nil
+}
+
+func (r *Repository) UpdateUserById(userId uint, update dto.UserUpdateDTO) (ds.User, error) {
+	var user ds.User
+	password := update.Password
+	if password != nil {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost)
+		if err != nil {
+			return ds.User{}, err
+
+		}
+		hashedPasswordStr := string(hashedPassword)
+		user.HashedPassword = hashedPasswordStr
+	}
+	if update.Login != nil {
+		user.Login = *update.Login
+	}
+	res := r.db.Model(&ds.User{}).Where("id = ?", userId).Updates(user)
+	if res.RowsAffected == 0 {
+		return ds.User{}, gorm.ErrRecordNotFound
+	}
+	if res.Error != nil {
+		return ds.User{}, res.Error
+	}
+	user, _ = r.GetUserById(userId)
 	return user, nil
 }

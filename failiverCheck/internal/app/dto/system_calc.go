@@ -34,15 +34,48 @@ type SystemCalculationDTO struct {
 	DateFormed           *time.Time `json:"date_formed"`
 	DateClosed           *time.Time `json:"date_accepted"`
 
-	User                   UserDTO                     `json:"user"`
-	Moderator              *UserDTO                    `json:"moderator"`
+	User                   string                      `json:"user"`
+	Moderator              *string                     `json:"moderator"`
 	ComponentsToSystemCalc []ComponentsToSystemCalcDTO `json:"components"`
 }
 
-func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
-	var moderator *UserDTO = nil
+type SystemCalculationInfoDTO struct {
+	ID                   uint       `json:"id"`
+	SystemName           *string    `json:"system_name"`
+	AvailableCalculation float32    `json:"available_calculation"`
+	Status               string     `json:"status"`
+	DateCreated          time.Time  `json:"date_created"`
+	DateFormed           *time.Time `json:"date_formed"`
+	DateClosed           *time.Time `json:"date_accepted"`
+
+	User      string  `json:"user"`
+	Moderator *string `json:"moderator"`
+}
+
+func ToSystemCalculationInfoDTO(orm ds.SystemCalculation) SystemCalculationInfoDTO {
+	var moderator *string = nil
 	if orm.Moderator != nil {
-		ptr := ToUserDTO(*orm.Moderator)
+		ptr := orm.Moderator.Login
+		moderator = &ptr
+	}
+	dto := SystemCalculationInfoDTO{
+		ID:                   orm.ID,
+		SystemName:           orm.SystemName,
+		AvailableCalculation: orm.AvailableCalculation,
+		Status:               orm.Status,
+		DateCreated:          orm.DateCreated,
+		DateFormed:           orm.DateFormed,
+		DateClosed:           orm.DateClosed,
+		User:                 orm.User.Login,
+		Moderator:            moderator,
+	}
+	return dto
+}
+
+func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
+	var moderator *string = nil
+	if orm.Moderator != nil {
+		ptr := orm.Moderator.Login
 		moderator = &ptr
 	}
 	var componentsToSystemCalc []ComponentsToSystemCalcDTO
@@ -57,7 +90,7 @@ func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
 		DateCreated:            orm.DateCreated,
 		DateFormed:             orm.DateFormed,
 		DateClosed:             orm.DateClosed,
-		User:                   ToUserDTO(orm.User),
+		User:                   orm.User.Login,
 		Moderator:              moderator,
 		ComponentsToSystemCalc: componentsToSystemCalc,
 	}
@@ -66,9 +99,18 @@ func ToSystemCalculationDTO(orm ds.SystemCalculation) SystemCalculationDTO {
 
 func ToSystemCalculationListDTO(arr []ds.SystemCalculation) []SystemCalculationDTO {
 	list := make([]SystemCalculationDTO, len(arr))
-	for _, el := range arr {
+	for i, el := range arr {
 		val := ToSystemCalculationDTO(el)
-		list = append(list, val)
+		list[i] = val
+	}
+	return list
+}
+
+func ToSystemCalculationInfoListDTO(arr []ds.SystemCalculation) []SystemCalculationInfoDTO {
+	list := make([]SystemCalculationInfoDTO, len(arr))
+	for i, el := range arr {
+		val := ToSystemCalculationInfoDTO(el)
+		list[i] = val
 	}
 	return list
 }

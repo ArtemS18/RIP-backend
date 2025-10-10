@@ -64,3 +64,23 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 	h.successHandler(ctx, 200, userDTO)
 
 }
+
+func (h *Handler) UpdateUser(ctx *gin.Context) {
+	var update dto.UserUpdateDTO
+	h.validateFields(ctx, &update)
+	if ctx.IsAborted() {
+		return
+	}
+	var userId uint = h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+	user, err := h.Repository.UpdateUserById(userId, update)
+	if err != nil {
+		h.errorHandler(ctx, 401, err)
+		return
+	}
+	userDTO := dto.ToUserDTO(user)
+	h.successHandler(ctx, 200, userDTO)
+
+}

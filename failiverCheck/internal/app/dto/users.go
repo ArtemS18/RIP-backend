@@ -10,6 +10,11 @@ type UserDTO struct {
 	IsModerator bool   `json:"is_moderator"`
 }
 
+type UserUpdateDTO struct {
+	Login    *string `json:"login"`
+	Password *string `json:"password"`
+}
+
 func ToUserDTO(orm ds.User) UserDTO {
 	dto := UserDTO{
 		ID:          orm.ID,

@@ -29,7 +29,7 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 		return
 	}
 	sysCalcs, err := h.Repository.GetSystemCalcList(filters)
-	sysCalcsResp := dto.ToSystemCalculationListDTO(sysCalcs)
+	sysCalcsResp := dto.ToSystemCalculationInfoListDTO(sysCalcs)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return

@@ -176,6 +176,9 @@ func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId
 	var sys_cacl ds.SystemCalculation
 	err := r.db.Preload("ComponentsToSystemCalc.Component").Where("id = ? AND status = ?", sysCaclId, ds.FORMED).First(&sys_cacl).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return sys_cacl, fmt.Errorf("only sys_calc with status FORMED can be moderating")
+		}
 		return sys_cacl, err
 	}
 	var status ds.Status
