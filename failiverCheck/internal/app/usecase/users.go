@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"failiverCheck/internal/app/ds"
+	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
 	utils "failiverCheck/internal/pkg/jwt"
 	"fmt"
@@ -41,4 +43,40 @@ func (uc *UseCase) Autho(credentials schemas.UserCredentials) (schemas.AuthoResp
 		AccessToken: tokenStr,
 	}
 	return dto, nil
+}
+
+func (uc *UseCase) RegisterUser(credentials schemas.UserCredentials) (ds.User, error) {
+	user, err := uc.Postgres.RegisterUser(credentials)
+	if err != nil {
+		return ds.User{}, err
+	}
+	return user, nil
+
+}
+
+func (uc *UseCase) LogoutUser(userId uint) error {
+	err := uc.Postgres.LogoutUser(userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (uc *UseCase) GetUser(userId uint) (dto.UserDTO, error) {
+	user, err := uc.Postgres.GetUserById(userId)
+	if err != nil {
+		return dto.UserDTO{}, err
+	}
+	userDTO := dto.ToUserDTO(user)
+	return userDTO, nil
+}
+
+func (uc *UseCase) UpdateUser(userId uint, update dto.UserUpdateDTO) (dto.UserDTO, error) {
+	user, err := uc.Postgres.UpdateUserById(userId, update)
+	if err != nil {
+		return dto.UserDTO{}, err
+	}
+	userDTO := dto.ToUserDTO(user)
+	return userDTO, nil
+
 }

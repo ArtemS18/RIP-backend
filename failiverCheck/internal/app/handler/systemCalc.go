@@ -25,14 +25,13 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	systemCalc, err := h.Postgres.GetSystemCalcById(uint(id))
-	sysCalcsResp := dto.ToSystemCalculationDTO(systemCalc)
+	systemCalc, err := h.UseCase.GetSystemCalc(uint(id))
 	if err != nil {
 		h.errorHandler(ctx, 404, err)
 		return
 	}
 
-	h.successHandler(ctx, 200, sysCalcsResp)
+	h.successHandler(ctx, 200, systemCalc)
 }
 
 // Show an system calc list
@@ -55,13 +54,12 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 		h.errorHandler(ctx, http.StatusBadRequest, errQ)
 		return
 	}
-	sysCalcs, err := h.Postgres.GetSystemCalcList(filters)
-	sysCalcsResp := dto.ToSystemCalculationInfoListDTO(sysCalcs)
+	sysCalcs, err := h.UseCase.GetSystemCalcList(filters)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
 	}
-	h.successHandler(ctx, http.StatusOK, sysCalcsResp)
+	h.successHandler(ctx, http.StatusOK, sysCalcs)
 }
 
 // Show user bucket
@@ -80,7 +78,7 @@ func (h *Handler) GetSystemCalcBucket(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	bucket, err := h.Postgres.GetCurrentSysCalcAndCount(userId)
+	bucket, err := h.UseCase.GetSystemCalcBucket(userId)
 	if err != nil {
 		h.errorHandler(ctx, 400, err)
 		return
@@ -111,13 +109,12 @@ func (h *Handler) UpdateSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	system, err := h.Postgres.UpdateSystemCalc(uint(sysCalcId), dto.UpdateSystemCalcDTO{SystemName: data.SystemName})
-	systemDto := dto.ToSystemCalculationDTO(system)
+	system, err := h.UseCase.UpdateSystemCalc(uint(sysCalcId), dto.UpdateSystemCalcDTO{SystemName: data.SystemName})
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	h.successHandler(ctx, 200, systemDto)
+	h.successHandler(ctx, 200, system)
 }
 
 // Update system calc status to FORMED by id
@@ -137,13 +134,12 @@ func (h *Handler) UpdateSystemCalcStatusToFormed(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	system, err := h.Postgres.UpdateSystemCalcStatusToFormed(uint(sysCalcId))
-	dto := dto.ToSystemCalculationDTO(system)
+	system, err := h.UseCase.UpdateSystemCalcStatusToFormed(uint(sysCalcId))
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	h.successHandler(ctx, 200, dto)
+	h.successHandler(ctx, 200, system)
 }
 
 // Moderate system calc, update status by id
@@ -169,13 +165,12 @@ func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	system, err := h.Postgres.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, data.Command)
+	system, err := h.UseCase.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, data.Command)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	dto := dto.ToSystemCalculationDTO(system)
-	h.successHandler(ctx, 200, dto)
+	h.successHandler(ctx, 200, system)
 }
 
 // Delete system calc by id
@@ -195,7 +190,7 @@ func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	err := h.Postgres.DeleteSystemCalc(uint(sysCalcId))
+	err := h.UseCase.DeleteSystemCalc(uint(sysCalcId))
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return

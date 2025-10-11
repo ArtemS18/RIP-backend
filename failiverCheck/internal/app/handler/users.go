@@ -25,7 +25,7 @@ func (h *Handler) RegisterUser(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	user, err := h.Postgres.RegisterUser(credentials)
+	user, err := h.UseCase.RegisterUser(credentials)
 	if err != nil {
 		h.errorHandler(ctx, 401, err)
 		return
@@ -77,7 +77,7 @@ func (h *Handler) LogoutUser(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	err := h.Postgres.LogoutUser(userId)
+	err := h.UseCase.LogoutUser(userId)
 	if err != nil {
 		h.errorHandler(ctx, 401, err)
 		return
@@ -102,13 +102,12 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	user, err := h.Postgres.GetUserById(userId)
+	user, err := h.UseCase.GetUser(userId)
 	if err != nil {
 		h.errorHandler(ctx, 401, err)
 		return
 	}
-	userDTO := dto.ToUserDTO(user)
-	h.successHandler(ctx, 200, userDTO)
+	h.successHandler(ctx, 200, user)
 
 }
 
@@ -134,12 +133,11 @@ func (h *Handler) UpdateUser(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	user, err := h.Postgres.UpdateUserById(userId, update)
+	user, err := h.UseCase.UpdateUser(userId, update)
 	if err != nil {
 		h.errorHandler(ctx, 401, err)
 		return
 	}
-	userDTO := dto.ToUserDTO(user)
-	h.successHandler(ctx, 200, userDTO)
+	h.successHandler(ctx, 200, user)
 
 }

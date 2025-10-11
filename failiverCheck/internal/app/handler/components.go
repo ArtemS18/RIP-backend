@@ -85,7 +85,7 @@ func (h *Handler) UpdateComponent(ctx *gin.Context) {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	component, err := h.Postgres.UpdateComponentById(uint(id), update)
+	component, err := h.UseCase.UpdateComponent(uint(id), update)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
@@ -112,7 +112,7 @@ func (h *Handler) CreateComponent(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	component, err := h.Postgres.CreateComponent(create)
+	component, err := h.UseCase.CreateComponent(create)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusInternalServerError, err)
 		return
@@ -138,18 +138,8 @@ func (h *Handler) DeleteComponent(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	component, err := h.Postgres.GetComponentById(id)
+	err := h.UseCase.DeleteComponent(uint(id))
 	if err != nil {
-		h.errorHandler(ctx, http.StatusNotFound, err)
-		return
-	}
-	imgUrl := component.Img
-
-	if err := h.Postgres.DeletedComponentById(uint(id)); err != nil {
-		h.errorHandler(ctx, http.StatusNotFound, err)
-		return
-	}
-	if err := h.Minio.DeleteComponentImg(ctx, &imgUrl); err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
@@ -178,7 +168,7 @@ func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	err = h.Postgres.AddComponentInSystemCalc(uint(id), userId)
+	err = h.UseCase.AddComponentInSystemCalc(uint(id), userId)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
@@ -208,27 +198,15 @@ func (h *Handler) UpdateComponentImg(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	location, err := h.Minio.UploadComponentImg(ctx, dto.ComponentImgCreateDTO{
+	location, err := h.UseCase.UpdateComponentImg(uint(id), dto.ComponentImgCreateDTO{
 		File:        ctx.Request.Body,
 		FilePath:    "img/",
 		FileSize:    fileSize,
 		ContentType: contentType,
 	})
-	log.Info(location)
 	if err != nil {
-		h.errorHandler(ctx, 404, err)
+		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
 	}
-	component, err := h.Postgres.GetComponentById(id)
-	if err != nil {
-		h.errorHandler(ctx, 404, err)
-		return
-	}
-	if component.Img != "" {
-		if err = h.Minio.DeleteComponentImg(ctx, &component.Img); err != nil {
-			log.Error(err)
-		}
-	}
-	h.Postgres.UpdateComponentById(uint(id), dto.UpdateComponentDTO{Img: &location})
 	h.successHandler(ctx, 200, map[string]string{"img_url": location})
 }

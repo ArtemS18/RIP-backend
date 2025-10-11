@@ -57,7 +57,7 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("error initializing minio: %v", errRep)
 	}
-	uc := usecase.NewUseCase(pg, config)
+	uc := usecase.NewUseCase(pg, minio, config)
 	handler := handler.NewHandler(pg, minio, uc, config)
 
 	app := app.NewApplication(config, router, handler)
