@@ -1,9 +1,9 @@
 package main
 
 import (
+	"failiverCheck/internal/app/adapters/http"
 	"failiverCheck/internal/app/config"
 	"failiverCheck/internal/app/dsn"
-	"failiverCheck/internal/app/handler"
 	"failiverCheck/internal/app/repository/minio"
 	"failiverCheck/internal/app/repository/postgres"
 	"failiverCheck/internal/app/usecase"
@@ -58,7 +58,7 @@ func main() {
 		logrus.Fatalf("error initializing minio: %v", errRep)
 	}
 	uc := usecase.NewUseCase(pg, minio, config)
-	handler := handler.NewHandler(pg, minio, uc, config)
+	handler := http.NewHandler(pg, minio, uc, config)
 
 	app := app.NewApplication(config, router, handler)
 	app.RunApplication()

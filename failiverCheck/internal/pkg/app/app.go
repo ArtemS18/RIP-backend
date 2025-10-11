@@ -1,8 +1,8 @@
 package app
 
 import (
+	"failiverCheck/internal/app/adapters/http"
 	"failiverCheck/internal/app/config"
-	"failiverCheck/internal/app/handler"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -12,10 +12,10 @@ import (
 type Application struct {
 	Config  *config.Config
 	Router  *gin.Engine
-	Handler *handler.Handler
+	Handler *http.Handler
 }
 
-func NewApplication(c *config.Config, r *gin.Engine, h *handler.Handler) *Application {
+func NewApplication(c *config.Config, r *gin.Engine, h *http.Handler) *Application {
 	return &Application{
 		Config:  c,
 		Router:  r,

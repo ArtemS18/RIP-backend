@@ -1,11 +1,11 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
 	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -33,38 +33,59 @@ type Config struct {
 }
 
 func NewConfig() (*Config, error) {
-	configName := "config"
 	_ = godotenv.Load()
-	if envName := os.Getenv("CONFIG_NAME"); envName != "" {
-		configName = envName
-	}
+	prefix := "APP"
+	keySeparator := "__"
 
-	viper.SetConfigName(configName)
+	viper.SetConfigType("toml")
 	viper.AddConfigPath("config")
 	viper.AddConfigPath(".")
-	viper.SetConfigType("toml")
-	viper.WatchConfig()
-
-	err := viper.ReadInConfig()
-	if err != nil {
-		return nil, err
-	}
+	viper.SetEnvPrefix(prefix)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", keySeparator))
 	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	serverConf := &ServerConfig{}
-	minioConf := &MinioConfig{}
-	config := &Config{Server: serverConf, Minio: minioConf}
+	configName := os.Getenv("CONFIG_NAME")
+	if configName == "" {
+		configName = "config"
+	}
+	viper.SetConfigName(configName)
 
-	err = viper.Unmarshal(config)
-	if err != nil {
+	if err := viper.ReadInConfig(); err != nil {
+		if _, notFound := err.(viper.ConfigFileNotFoundError); !notFound {
+			return nil, err
+		}
+	}
+	LoadEnvInViper(prefix, keySeparator)
+
+	cfg := &Config{
+		Server: &ServerConfig{},
+		Minio:  &MinioConfig{},
+		JWT:    &JWTConfig{},
+	}
+	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, err
 	}
-	// err = viper.Unmarshal(minioConf)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	log.Info(config.Minio.AccessKey)
-	log.Info("Config created")
-	return config, nil
+
+	if cfg.JWT.SecretKey == "" {
+		return nil, fmt.Errorf("jwt.secret_key is required (ENV or file)")
+	}
+	return cfg, nil
+}
+
+func LoadEnvInViper(prefix string, keySeparator string) {
+	for _, e := range os.Environ() {
+		parts := strings.SplitN(e, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		name, val := parts[0], parts[1]
+		if !strings.HasPrefix(name, prefix) {
+			continue
+		}
+		key := strings.TrimPrefix(name, prefix)
+		key = strings.TrimPrefix(key, keySeparator)
+		key = strings.ReplaceAll(key, keySeparator, ".")
+		key = strings.ToLower(key)
+		viper.Set(key, val)
+	}
 }
