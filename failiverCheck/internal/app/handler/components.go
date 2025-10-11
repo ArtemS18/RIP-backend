@@ -28,7 +28,7 @@ func (h *Handler) GetComponent(ctx *gin.Context) {
 		return
 	}
 	log.Info(id)
-	component, err := h.Postgres.GetComponentById(id)
+	component, err := h.UseCase.GetComponent(id)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
@@ -54,18 +54,10 @@ func (h *Handler) GetComponents(ctx *gin.Context) {
 	searchQuery := ctx.Query("search")
 
 	log.Info(searchQuery)
-	if searchQuery == "" {
-		components, err = h.Postgres.GetComponents()
-		if err != nil {
-			h.errorHandler(ctx, http.StatusBadRequest, err)
-			return
-		}
-	} else {
-		components, err = h.Postgres.GetComponentsByTitle(searchQuery)
-		if err != nil {
-			h.errorHandler(ctx, http.StatusNotFound, err)
-			return
-		}
+	components, err = h.UseCase.GetComponents(searchQuery)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
 	}
 	h.successHandler(ctx, http.StatusOK, schemas.ComponentsRes{Components: components})
 }

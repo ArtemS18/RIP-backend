@@ -27,6 +27,7 @@ func (uc *UseCase) Autho(credentials schemas.UserCredentials) (schemas.AuthoResp
 	logrus.Info(time.Unix(int64(exp), 0).Format(time.ANSIC))
 	claims["sub"] = user.ID
 	claims["exp"] = exp
+	claims["login"] = user.Login
 	claims["is_moderator"] = user.IsModerator
 	claims["token_type"] = "access"
 
