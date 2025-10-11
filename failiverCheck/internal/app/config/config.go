@@ -25,11 +25,18 @@ type JWTConfig struct {
 	SecretKey        string `mapstructure:"secret_key"`
 	ExpiresAtMinutes int    `mapstructure:"expire_at_minutes"`
 }
+type RedisConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Password string `mapstructure:"password"`
+	DB       int    `mapstructure:"db"`
+}
 
 type Config struct {
 	Minio  *MinioConfig  `mapstructure:"minio"`
 	Server *ServerConfig `mapstructure:"server"`
 	JWT    *JWTConfig    `mapstructure:"jwt"`
+	Redis  *RedisConfig  `mapstructure:"redis"`
 }
 
 func NewConfig() (*Config, error) {
@@ -61,6 +68,7 @@ func NewConfig() (*Config, error) {
 		Server: &ServerConfig{},
 		Minio:  &MinioConfig{},
 		JWT:    &JWTConfig{},
+		Redis:  &RedisConfig{},
 	}
 	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, err
