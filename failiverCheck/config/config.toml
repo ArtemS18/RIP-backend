@@ -8,3 +8,7 @@ port = 9000
 access_key = "admin"
 secret_key = "admin1234"
 bucket = "failivercheck"
+
+[jwt]
+secret_key = "secret_key"
+expire_at_minutes = 10

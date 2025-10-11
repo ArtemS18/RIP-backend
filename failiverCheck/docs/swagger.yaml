@@ -19,12 +19,29 @@ definitions:
       type:
         type: string
     type: object
+  ds.User:
+    properties:
+      is_moderator:
+        type: boolean
+      login:
+        type: string
+    type: object
   dto.ComponentInSystemCalcDTO:
     properties:
       id:
         type: integer
       title:
         type: string
+    type: object
+  dto.ComponentToSystemCalcByIdDTO:
+    properties:
+      component_id:
+        type: integer
+      system_calculation_id:
+        type: integer
+    required:
+    - component_id
+    - system_calculation_id
     type: object
   dto.ComponentsToSystemCalcDTO:
     properties:
@@ -122,6 +139,31 @@ definitions:
       type:
         type: string
     type: object
+  dto.UpdateComponentToSystemCalcDTO:
+    properties:
+      component_id:
+        type: integer
+      replication_count:
+        type: integer
+      system_calculation_id:
+        type: integer
+    type: object
+  dto.UserDTO:
+    properties:
+      id:
+        type: integer
+      is_moderator:
+        type: boolean
+      login:
+        type: string
+    type: object
+  dto.UserUpdateDTO:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
   schemas.Error:
     properties:
       description:
@@ -141,6 +183,16 @@ definitions:
         type: string
     required:
     - system_name
+    type: object
+  schemas.UserCredentials:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
     type: object
 externalDocs:
   description: OpenAPI
@@ -287,6 +339,46 @@ paths:
           schema:
             $ref: '#/definitions/schemas.Error'
       summary: Show a component by id
+      tags:
+      - Components
+  /components/{id}/img:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Update component image
+      parameters:
+      - description: Component ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: image
+        in: formData
+        name: img
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Update component image
       tags:
       - Components
   /components/{id}/system_calc/:
@@ -558,6 +650,224 @@ paths:
       summary: Show user bucket
       tags:
       - System caclculation
+  /system_calcs_to_components/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete component in system calc
+      parameters:
+      - description: Delete schema
+        in: body
+        name: create
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ComponentToSystemCalcByIdDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Delete component in system calc
+      tags:
+      - Components To SystemCalc
+    put:
+      consumes:
+      - application/json
+      description: Update component in system calc
+      parameters:
+      - description: Update schema
+        in: body
+        name: create
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateComponentToSystemCalcDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ComponentsToSystemCalcDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Update component in system calc
+      tags:
+      - Components To SystemCalc
+  /users/auth:
+    post:
+      consumes:
+      - application/json
+      description: Autho User
+      parameters:
+      - description: User Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Autho User
+      tags:
+      - Users
+  /users/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout User
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Logout User
+      tags:
+      - Users
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      description: Show current User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Show current User
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update current User
+      parameters:
+      - description: User Update
+        in: body
+        name: update
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Update current User
+      tags:
+      - Users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register User
+      parameters:
+      - description: User Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ds.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Register User
+      tags:
+      - Users
 securityDefinitions:
   BasicAuth:
     type: basic

@@ -1,4 +1,4 @@
-package repository
+package minio
 
 import (
 	"failiverCheck/internal/app/config"
@@ -14,17 +14,17 @@ type Minio struct {
 	Config *config.MinioConfig
 }
 
-func NewMinio(config *config.Config) (*Minio, error) {
-	endpoint := fmt.Sprintf("%s:%d", config.Minio.Host, config.Minio.Port)
+func NewMinio(config *config.MinioConfig) (*Minio, error) {
+	endpoint := fmt.Sprintf("%s:%d", config.Host, config.Port)
 	fmt.Println(endpoint)
 	client, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(config.Minio.AccessKey, config.Minio.SecretKey, ""),
+		Creds:  credentials.NewStaticV4(config.AccessKey, config.SecretKey, ""),
 		Secure: false,
 	})
 	if err != nil {
 		logrus.Error(err.Error())
 		return nil, err
 	}
-	return &Minio{Client: client, Config: config.Minio}, nil
+	return &Minio{Client: client, Config: config}, nil
 
 }

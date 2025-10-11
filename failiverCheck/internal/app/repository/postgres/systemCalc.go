@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"failiverCheck/internal/app/ds"
@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r *Repository) CreateSystemCalc(userId uint) (ds.SystemCalculation, error) {
+func (r *Postgres) CreateSystemCalc(userId uint) (ds.SystemCalculation, error) {
 	newSystemCalc := ds.SystemCalculation{
 		UserID:      userId,
 		ModeratorID: nil,
@@ -22,7 +22,7 @@ func (r *Repository) CreateSystemCalc(userId uint) (ds.SystemCalculation, error)
 	return newSystemCalc, nil
 }
 
-func (r *Repository) GetSystemCalcByUserId(userId uint) (ds.SystemCalculation, error) {
+func (r *Postgres) GetSystemCalcByUserId(userId uint) (ds.SystemCalculation, error) {
 	var exist_calc ds.SystemCalculation
 	findErr := r.db.Where("user_id = ? AND status = ?", userId, ds.DRAFT).First(&exist_calc).Error
 	if findErr != nil {
@@ -31,7 +31,7 @@ func (r *Repository) GetSystemCalcByUserId(userId uint) (ds.SystemCalculation, e
 	return exist_calc, nil
 
 }
-func (r *Repository) GetSystemCalcById(id uint) (ds.SystemCalculation, error) {
+func (r *Postgres) GetSystemCalcById(id uint) (ds.SystemCalculation, error) {
 	var sysCalc ds.SystemCalculation
 	findErr := r.db.Preload("Moderator").Preload("User").Preload("ComponentsToSystemCalc.Component").Where("id = ? AND status <> ?", id, ds.DELETED).First(&sysCalc).Error
 	if findErr != nil {
@@ -40,7 +40,7 @@ func (r *Repository) GetSystemCalcById(id uint) (ds.SystemCalculation, error) {
 	return sysCalc, nil
 }
 
-func (r *Repository) CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, error) {
+func (r *Postgres) CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, error) {
 	exist_calc, findErr := r.GetSystemCalcByUserId(userId)
 	if findErr != nil {
 		if findErr == gorm.ErrRecordNotFound {
@@ -53,7 +53,7 @@ func (r *Repository) CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, e
 
 }
 
-func (r *Repository) AddComponentInSystemCalc(componentID uint, userId uint) error {
+func (r *Postgres) AddComponentInSystemCalc(componentID uint, userId uint) error {
 	systemCal, err := r.CreateOrGetSystemCalc(userId)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (r *Repository) AddComponentInSystemCalc(componentID uint, userId uint) err
 	return nil
 }
 
-func (r *Repository) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBucketDTO, error) {
+func (r *Postgres) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBucketDTO, error) {
 	systemCalc, err := r.GetSystemCalcByUserId(userId)
 	dto := dto.CurrentUserBucketDTO{}
 	if err != nil {
@@ -99,7 +99,7 @@ func (r *Repository) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBuck
 
 }
 
-func (r *Repository) DeleteSystemCalc(sysCalcId uint) error {
+func (r *Postgres) DeleteSystemCalc(sysCalcId uint) error {
 	date := time.Now()
 	res := r.db.Model(ds.SystemCalculation{}).Where(
 		"id = ? AND status <> ?", sysCalcId, ds.DELETED).Updates(
@@ -114,7 +114,7 @@ func (r *Repository) DeleteSystemCalc(sysCalcId uint) error {
 
 	return res.Error
 }
-func (r *Repository) GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.SystemCalculation, error) {
+func (r *Postgres) GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.SystemCalculation, error) {
 	var sys_cacls []ds.SystemCalculation
 	allowedStatus := []string{string(ds.COMPLETED), string(ds.FORMED), string(ds.REJECTED)}
 	query := r.db.Preload("Moderator").Preload("User").Preload("ComponentsToSystemCalc.Component").Where("status IN (?)", allowedStatus)
@@ -154,7 +154,7 @@ func (r *Repository) GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.Syst
 	return sys_cacls, nil
 }
 
-func (r *Repository) UpdateSystemCalc(id uint, dto dto.UpdateSystemCalcDTO) (ds.SystemCalculation, error) {
+func (r *Postgres) UpdateSystemCalc(id uint, dto dto.UpdateSystemCalcDTO) (ds.SystemCalculation, error) {
 	var system ds.SystemCalculation
 	res := r.db.Model(&system).Where("id = ? AND status != ?", id, ds.DELETED).Updates(dto)
 	if res.RowsAffected == 0 {
@@ -172,7 +172,7 @@ func (r *Repository) UpdateSystemCalc(id uint, dto dto.UpdateSystemCalcDTO) (ds.
 
 	return updatedSystem, nil
 }
-func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error) {
+func (r *Postgres) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error) {
 	var sys_cacl ds.SystemCalculation
 	err := r.db.Preload("ComponentsToSystemCalc.Component").Where("id = ? AND status = ?", sysCaclId, ds.FORMED).First(&sys_cacl).Error
 	if err != nil {
@@ -204,7 +204,7 @@ func (r *Repository) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId
 
 }
 
-func (r *Repository) UpdateSystemCalcStatusToFormed(id uint) (ds.SystemCalculation, error) {
+func (r *Postgres) UpdateSystemCalcStatusToFormed(id uint) (ds.SystemCalculation, error) {
 	sys_cacl, err := r.GetSystemCalcById(id)
 	if err != nil {
 		return sys_cacl, err

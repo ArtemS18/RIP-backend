@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"failiverCheck/internal/app/ds"
@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r *Repository) UpdateComponentsToSystemCalc(update dto.UpdateComponentToSystemCalcDTO) (ds.ComponentsToSystemCalc, error) {
+func (r *Postgres) UpdateComponentsToSystemCalc(update dto.UpdateComponentToSystemCalcDTO) (ds.ComponentsToSystemCalc, error) {
 	var new ds.ComponentsToSystemCalc
 	res := r.db.Model(&new).Where("system_calculation_id = ? AND component_id = ?", update.SystemCalculationID, update.ComponentID).Update("replication_count", update.ReplicationCount)
 	r.db.Preload("Component").Where("system_calculation_id = ? AND component_id = ?", update.SystemCalculationID, update.ComponentID).First(&new)
@@ -17,7 +17,7 @@ func (r *Repository) UpdateComponentsToSystemCalc(update dto.UpdateComponentToSy
 	return new, res.Error
 }
 
-func (r *Repository) DeleteComponentsToSystemCalc(ids dto.ComponentToSystemCalcByIdDTO) error {
+func (r *Postgres) DeleteComponentsToSystemCalc(ids dto.ComponentToSystemCalcByIdDTO) error {
 	var deletedComponent ds.ComponentsToSystemCalc
 
 	res := r.db.Where("system_calculation_id = ? AND component_id = ?", ids.SystemCalculationID, ids.ComponentID).Delete(&deletedComponent)

@@ -21,10 +21,15 @@ type MinioConfig struct {
 	SecretKey string `mapstructure:"secret_key"`
 	Bucket    string `mapstructure:"bucket"`
 }
+type JWTConfig struct {
+	SecretKey        string `mapstructure:"secret_key"`
+	ExpiresAtMinutes int    `mapstructure:"expire_at_minutes"`
+}
 
 type Config struct {
 	Minio  *MinioConfig  `mapstructure:"minio"`
 	Server *ServerConfig `mapstructure:"server"`
+	JWT    *JWTConfig    `mapstructure:"jwt"`
 }
 
 func NewConfig() (*Config, error) {

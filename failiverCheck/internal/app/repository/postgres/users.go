@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"failiverCheck/internal/app/ds"
@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r *Repository) RegisterUser(credentials schemas.UserCredentials) (ds.User, error) {
+func (r *Postgres) RegisterUser(credentials schemas.UserCredentials) (ds.User, error) {
 	password := credentials.Password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -32,7 +32,7 @@ func (r *Repository) RegisterUser(credentials schemas.UserCredentials) (ds.User,
 
 }
 
-func (r *Repository) AuthUser(credentials schemas.UserCredentials) error {
+func (r *Postgres) AuthUser(credentials schemas.UserCredentials) error {
 	var user ds.User
 	password := credentials.Password
 	err := r.db.Where("login = ?", credentials.Login).First(&user).Error
@@ -46,11 +46,21 @@ func (r *Repository) AuthUser(credentials schemas.UserCredentials) error {
 
 }
 
-func (r *Repository) LogoutUser(userId uint) error {
+func (r *Postgres) GetUserByLogin(login string) (ds.User, error) {
+	var user ds.User
+	err := r.db.Where("login = ?", login).First(&user).Error
+	if err != nil {
+		return ds.User{}, err
+	}
+	return user, nil
+
+}
+
+func (r *Postgres) LogoutUser(userId uint) error {
 	return nil
 }
 
-func (r *Repository) GetUserById(userId uint) (ds.User, error) {
+func (r *Postgres) GetUserById(userId uint) (ds.User, error) {
 	var user ds.User
 	err := r.db.Find(&user, userId).Error
 	if err != nil {
@@ -59,7 +69,7 @@ func (r *Repository) GetUserById(userId uint) (ds.User, error) {
 	return user, nil
 }
 
-func (r *Repository) UpdateUserById(userId uint, update dto.UserUpdateDTO) (ds.User, error) {
+func (r *Postgres) UpdateUserById(userId uint, update dto.UserUpdateDTO) (ds.User, error) {
 	var user ds.User
 	password := update.Password
 	if password != nil {
