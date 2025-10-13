@@ -73,11 +73,12 @@ func (h *Handler) AuthUser(ctx *gin.Context) {
 // @Failure      500  {object}  schemas.Error
 // @Router       /users/logout [post]
 func (h *Handler) LogoutUser(ctx *gin.Context) {
-	var userId uint = h.GetUserID(ctx)
-	if ctx.IsAborted() {
+	token, err := h.GetJWTToken(ctx)
+	if err != nil {
+		h.errorHandler(ctx, 401, err)
 		return
 	}
-	err := h.UseCase.LogoutUser(userId)
+	err = h.UseCase.LogoutUser(ctx.Request.Context(), token)
 	if err != nil {
 		h.errorHandler(ctx, 401, err)
 		return

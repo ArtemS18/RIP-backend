@@ -26,10 +26,14 @@ type JWTConfig struct {
 	ExpiresAtMinutes int    `mapstructure:"expire_at_minutes"`
 }
 type RedisConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
-	Password string `mapstructure:"password"`
-	DB       int    `mapstructure:"db"`
+	Host           string `mapstructure:"host"`
+	Port           int    `mapstructure:"port"`
+	User           string `mapstructure:"user"`
+	Password       string `mapstructure:"password"`
+	DB             int    `mapstructure:"db"`
+	DialTimeoutSec int    `mapstructure:"dial_timeout_sec"`
+	ReadTimeoutSec int    `mapstructure:"read_timeout_sec"`
+	AppPrefix      string `mapstructure:"app_prefix"`
 }
 
 type Config struct {

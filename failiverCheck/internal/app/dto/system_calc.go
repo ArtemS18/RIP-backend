@@ -16,6 +16,13 @@ type SystemCalcFilters struct {
 	Status          *ds.Status `form:"status"`
 }
 
+type SearchSystemCalcDTO struct {
+	DateFormedStart *string    `form:"date_formed_start"`
+	DateFormedEnd   *string    `form:"date_formed_end"`
+	Status          *ds.Status `form:"status"`
+	UserID          *uint      `form:"-"`
+}
+
 type UpdateSystemCalcDTO struct {
 	SystemName           *string    `json:"system_name"`
 	Status               *ds.Status `json:"status"`

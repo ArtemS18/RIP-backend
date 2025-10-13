@@ -1,7 +1,9 @@
-package jwt
+package jwtUtils
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -35,4 +37,14 @@ func ValidateJwtToken(tokenStr string, secretKey string) (jwt.MapClaims, error) 
 		return nil, fmt.Errorf("expire time out")
 	}
 	return claims, nil
+}
+
+func ParseJWTFormHeader(header http.Header) (string, error) {
+	jwtPrefix := "Bearer "
+	jwtStr := header.Get("Authorization")
+	if !strings.HasPrefix(jwtStr, jwtPrefix) {
+		return "", fmt.Errorf("access token not found")
+	}
+	jwtTokenStr := jwtStr[len(jwtPrefix):]
+	return jwtTokenStr, nil
 }

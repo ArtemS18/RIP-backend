@@ -1,16 +1,17 @@
 package usecase
 
 import (
+	"context"
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
-	utils "failiverCheck/internal/pkg/jwt"
+	"failiverCheck/internal/pkg/jwtUtils"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -33,7 +34,7 @@ func (uc *UseCase) Autho(credentials schemas.UserCredentials) (schemas.AuthoResp
 	claims["is_moderator"] = user.IsModerator
 	claims["token_type"] = "access"
 
-	tokenStr, err := utils.CreateJwtToken(claims, uc.Config.JWT.SecretKey)
+	tokenStr, err := jwtUtils.CreateJwtToken(claims, uc.Config.JWT.SecretKey)
 	if err != nil {
 		return schemas.AuthoResp{}, err
 	}
@@ -54,8 +55,8 @@ func (uc *UseCase) RegisterUser(credentials schemas.UserCredentials) (ds.User, e
 
 }
 
-func (uc *UseCase) LogoutUser(userId uint) error {
-	err := uc.Postgres.LogoutUser(userId)
+func (uc *UseCase) LogoutUser(ctx context.Context, token string) error {
+	err := uc.Redis.SetBlackListJWT(ctx, token, time.Duration(uc.Config.JWT.ExpiresAtMinutes)*time.Minute)
 	if err != nil {
 		return err
 	}
@@ -79,4 +80,19 @@ func (uc *UseCase) UpdateUser(userId uint, update dto.UserUpdateDTO) (dto.UserDT
 	userDTO := dto.ToUserDTO(user)
 	return userDTO, nil
 
+}
+
+func (uc *UseCase) ValidateRole(user dto.UserDTO, allowedRoles ...schemas.Role) error {
+	var role schemas.Role
+	if user.IsModerator {
+		role = schemas.ModeratorRole
+	}
+	if !slices.Contains(allowedRoles, schemas.ModeratorRole) {
+		allowedRoles = append(allowedRoles, schemas.ModeratorRole)
+	}
+
+	if !slices.Contains(allowedRoles, role) {
+		return fmt.Errorf("not allowed role")
+	}
+	return nil
 }

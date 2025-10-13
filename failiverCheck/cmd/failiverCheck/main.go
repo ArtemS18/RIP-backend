@@ -6,6 +6,7 @@ import (
 	"failiverCheck/internal/app/dsn"
 	"failiverCheck/internal/app/repository/minio"
 	"failiverCheck/internal/app/repository/postgres"
+	"failiverCheck/internal/app/repository/redis"
 	"failiverCheck/internal/app/usecase"
 	"failiverCheck/internal/pkg/app"
 	"fmt"
@@ -57,7 +58,11 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("error initializing minio: %v", errRep)
 	}
-	uc := usecase.NewUseCase(pg, minio, config)
+	redis, err := redis.New(config.Redis)
+	if err != nil {
+		logrus.Fatalf("error initializing redis: %v", errRep)
+	}
+	uc := usecase.NewUseCase(pg, minio, config, &redis)
 	handler := http.NewHandler(pg, minio, uc, config)
 
 	app := app.NewApplication(config, router, handler)

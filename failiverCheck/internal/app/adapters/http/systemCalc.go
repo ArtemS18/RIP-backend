@@ -54,7 +54,12 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 		h.errorHandler(ctx, http.StatusBadRequest, errQ)
 		return
 	}
-	sysCalcs, err := h.UseCase.GetSystemCalcList(filters)
+	user, err := h.GetUserDTO(ctx)
+	if err != nil {
+		h.errorHandler(ctx, 404, err)
+		return
+	}
+	sysCalcs, err := h.UseCase.GetSystemCalcList(user, filters)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
@@ -155,7 +160,10 @@ func (h *Handler) UpdateSystemCalcStatusToFormed(ctx *gin.Context) {
 // @Failure      500  {object}  schemas.Error
 // @Router       /system_calcs/{id}/status [put]
 func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
-	moderatorId := uint(1)
+	moderatorId := h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
 	sysCalcId := h.getIntParam(ctx, "id")
 	if ctx.IsAborted() {
 		return
@@ -190,7 +198,11 @@ func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	err := h.UseCase.DeleteSystemCalc(uint(sysCalcId))
+	userId := h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+	err := h.UseCase.DeleteSystemCalc(userId, uint(sysCalcId))
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return

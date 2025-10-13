@@ -14,8 +14,16 @@ func (uc *UseCase) GetSystemCalc(id uint) (dto.SystemCalculationDTO, error) {
 	return sysCalcsResp, nil
 }
 
-func (uc *UseCase) GetSystemCalcList(filters dto.SystemCalcFilters) ([]dto.SystemCalculationInfoDTO, error) {
-	sysCalcs, err := uc.Postgres.GetSystemCalcList(filters)
+func (uc *UseCase) GetSystemCalcList(user dto.UserDTO, filters dto.SystemCalcFilters) ([]dto.SystemCalculationInfoDTO, error) {
+	searchDto := dto.SearchSystemCalcDTO{
+		DateFormedStart: filters.DateFormedStart,
+		DateFormedEnd:   filters.DateFormedEnd,
+		Status:          filters.Status,
+	}
+	if !user.IsModerator {
+		searchDto.UserID = &user.ID
+	}
+	sysCalcs, err := uc.Postgres.GetSystemCalcList(searchDto)
 	sysCalcsResp := dto.ToSystemCalculationInfoListDTO(sysCalcs)
 	if err != nil {
 		return nil, err
@@ -58,8 +66,8 @@ func (uc *UseCase) UpdateSystemCalcStatusModerator(sysCalcId uint, moderatorId u
 	return dto, nil
 }
 
-func (uc *UseCase) DeleteSystemCalc(sysCalcId uint) error {
-	err := uc.Postgres.DeleteSystemCalc(sysCalcId)
+func (uc *UseCase) DeleteSystemCalc(userId uint, sysCalcId uint) error {
+	err := uc.Postgres.DeleteSystemCalc(userId, sysCalcId)
 	if err != nil {
 		return err
 	}

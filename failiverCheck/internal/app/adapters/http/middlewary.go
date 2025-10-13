@@ -2,82 +2,79 @@ package http
 
 import (
 	"failiverCheck/internal/app/dto"
-	"failiverCheck/internal/app/schemas"
 	"fmt"
 	"net/http"
-	"slices"
-	"strings"
 
-	utils "failiverCheck/internal/pkg/jwt"
+	"failiverCheck/internal/pkg/jwtUtils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
-type Role string
-
-var (
-	ModeratorRole Role = "MODERATOR"
-	UserRole      Role = "USER"
-)
-
 func (h *Handler) AuthoMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		jwtPrefix := "Bearer "
-		jwtStr := ctx.Request.Header.Get("Authorization")
-		if !strings.HasPrefix(jwtStr, jwtPrefix) {
-			ctx.JSON(http.StatusUnauthorized, schemas.Error{
-				Status:      "error",
-				Description: "access token not found",
-			})
-			ctx.Abort()
-			return
-		}
-		jwtTokenStr := jwtStr[len(jwtPrefix):]
-		claims, err := utils.ValidateJwtToken(jwtTokenStr, h.Config.JWT.SecretKey)
+		jwtTokenStr, err := jwtUtils.ParseJWTFormHeader(ctx.Request.Header)
 		if err != nil {
-			h.errorHandler(ctx, http.StatusUnauthorized, err)
+			h.errorHandler(ctx, 401, fmt.Errorf("access token not found"))
 			return
 		}
-		userId, ok := claims["sub"].(float64)
-		logrus.Info(userId)
-		if !ok {
-			h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("bad jwt credentials"))
+		user, err := h.UseCase.ValidateUser(ctx.Request.Context(), jwtTokenStr)
+		if err != nil {
+			logrus.Error(err)
+			h.errorHandler(ctx, 401, err)
 			return
 		}
-		is_moderator, ok := claims["is_moderator"].(bool)
-		logrus.Info(is_moderator)
-		if !ok {
-			h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("bad jwt credentials"))
-			return
-		}
-		login, ok := claims["login"].(string)
-		if !ok {
-			h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("bad jwt credentials"))
-			return
-		}
-		ctx.Set("userDTO", dto.UserDTO{ID: uint(userId), IsModerator: is_moderator, Login: login})
+		ctx.Set("userDTO", user)
+		ctx.Set("jwtToken", jwtTokenStr)
 		ctx.Next()
 	}
 }
 
-func (h *Handler) RoleValidateMiddleware(allowedRoles ...Role) gin.HandlerFunc {
+func (h *Handler) ModeratorValidateMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		jwtTokenStr, err := jwtUtils.ParseJWTFormHeader(ctx.Request.Header)
+		if err != nil {
+			h.errorHandler(ctx, 401, fmt.Errorf("access token not found"))
+			return
+		}
+		user, err := h.UseCase.ValidateUser(ctx.Request.Context(), jwtTokenStr)
+		if err != nil {
+			logrus.Error(err)
+			h.errorHandler(ctx, 401, err)
+			return
+		}
+		logrus.Error(user.ID, user.IsModerator, user.Login)
+		if !user.IsModerator {
+			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("not allowed role"))
+		}
+		ctx.Set("userDTO", user)
+		ctx.Set("jwtToken", jwtTokenStr)
+		ctx.Next()
+	}
+}
+
+func (h *Handler) SystemCalcAccessMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		user, err := h.GetUserDTO(ctx)
 		if err != nil {
-			h.errorHandler(ctx, 404, err)
+			h.errorHandler(ctx, http.StatusNotFound, err)
 			return
 		}
-		var role Role
-		if user.IsModerator {
-			role = ModeratorRole
+		// if user.IsModerator {
+		// 	ctx.Next()
+		// 	return
+		// }
+		id := h.getIntParam(ctx, "id")
+		if ctx.IsAborted() {
+			return
 		}
-		if !slices.Contains(allowedRoles, ModeratorRole) {
-			allowedRoles = append(allowedRoles, ModeratorRole)
+		sysCalc, err := h.UseCase.Postgres.GetSystemCalcById(uint(id))
+		if err != nil {
+			h.errorHandler(ctx, http.StatusNotFound, err)
+			return
 		}
-
-		if !slices.Contains(allowedRoles, role) {
-			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("not allowed role"))
+		if sysCalc.UserID != uint(user.ID) {
+			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("access denied"))
 			return
 		}
 		ctx.Next()
@@ -102,4 +99,16 @@ func (h *Handler) GetUserDTO(ctx *gin.Context) (dto.UserDTO, error) {
 		return dto.UserDTO{}, fmt.Errorf("invalid user id type: expected int, got %T", user)
 	}
 	return user, nil
+}
+
+func (h *Handler) GetJWTToken(ctx *gin.Context) (string, error) {
+	jwtRaw, ok := ctx.Get("jwtToken")
+	if !ok {
+		return "", fmt.Errorf("jwt token not found")
+	}
+	jwtTokenStr, ok := jwtRaw.(string)
+	if !ok {
+		return "", fmt.Errorf("invalid jwt token type: expected string, got %T", jwtTokenStr)
+	}
+	return jwtTokenStr, nil
 }

@@ -5,6 +5,7 @@ import (
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
+	"time"
 )
 
 type Postgres interface {
@@ -18,10 +19,10 @@ type Postgres interface {
 	AddComponentInSystemCalc(componentId, userId uint) error
 
 	GetSystemCalcById(id uint) (ds.SystemCalculation, error)
-	GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.SystemCalculation, error)
+	GetSystemCalcList(dto dto.SearchSystemCalcDTO) ([]ds.SystemCalculation, error)
 	GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBucketDTO, error)
 	UpdateSystemCalcStatusToFormed(userId uint) (ds.SystemCalculation, error)
-	DeleteSystemCalc(id uint) error
+	DeleteSystemCalc(userId uint, id uint) error
 	UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error)
 	UpdateSystemCalc(sysCalcId uint, update dto.UpdateSystemCalcDTO) (ds.SystemCalculation, error)
 
@@ -34,4 +35,9 @@ type Postgres interface {
 type Minio interface {
 	UploadComponentImg(ctx context.Context, uploadDTO dto.ComponentImgCreateDTO) (string, error)
 	DeleteComponentImg(ctx context.Context, objectName *string) error
+}
+
+type Redis interface {
+	SetBlackListJWT(ctx context.Context, token string, jwtTTL time.Duration) error
+	GetBlackListJWT(ctx context.Context, token string) error
 }

@@ -9,3 +9,9 @@ type AuthoResp struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
 }
+type Role string
+
+var (
+	ModeratorRole Role = "MODERATOR"
+	UserRole      Role = "USER"
+)

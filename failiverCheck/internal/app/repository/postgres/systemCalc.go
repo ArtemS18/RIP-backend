@@ -99,10 +99,10 @@ func (r *Postgres) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBucket
 
 }
 
-func (r *Postgres) DeleteSystemCalc(sysCalcId uint) error {
+func (r *Postgres) DeleteSystemCalc(sysCalcId uint, userId uint) error {
 	date := time.Now()
 	res := r.db.Model(ds.SystemCalculation{}).Where(
-		"id = ? AND status <> ?", sysCalcId, ds.DELETED).Updates(
+		"id = ? AND user_id = ? AND status <> ?", sysCalcId, userId, ds.DELETED).Updates(
 		ds.SystemCalculation{
 			Status:     string(ds.DELETED),
 			DateFormed: &date,
@@ -114,10 +114,13 @@ func (r *Postgres) DeleteSystemCalc(sysCalcId uint) error {
 
 	return res.Error
 }
-func (r *Postgres) GetSystemCalcList(filters dto.SystemCalcFilters) ([]ds.SystemCalculation, error) {
+func (r *Postgres) GetSystemCalcList(filters dto.SearchSystemCalcDTO) ([]ds.SystemCalculation, error) {
 	var sys_cacls []ds.SystemCalculation
 	allowedStatus := []string{string(ds.COMPLETED), string(ds.FORMED), string(ds.REJECTED)}
 	query := r.db.Preload("Moderator").Preload("User").Preload("ComponentsToSystemCalc.Component").Where("status IN (?)", allowedStatus)
+	if filters.UserID != nil {
+		query = query.Where("user_id = ?", *filters.UserID)
+	}
 	if filters.Status != nil {
 		if slices.Contains(allowedStatus, string(*filters.Status)) {
 			query = query.Where("status = ?", filters.Status)
