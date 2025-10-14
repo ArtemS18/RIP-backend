@@ -81,8 +81,7 @@ func (uc *UseCase) AddComponentInSystemCalc(userId uint, componentId uint) error
 	})
 	if err == nil {
 		return fmt.Errorf("component (id = %d) alredy added in system calculation (id = %d)", componentId, systemCal.ID)
-	}
-	if err != nil && err != gorm.ErrRecordNotFound {
+	} else if err != gorm.ErrRecordNotFound {
 		return err
 	}
 

@@ -16,7 +16,6 @@ type Postgres interface {
 	UpdateComponentById(id uint, update dto.UpdateComponentDTO) (ds.Component, error)
 	CreateComponent(create dto.CreateComponentDTO) (ds.Component, error)
 	DeletedComponentById(id uint) error
-	AddComponentInSystemCalc(componentId, userId uint) error
 
 	GetSystemCalcById(id uint) (ds.SystemCalculation, error)
 	GetSystemCalcList(dto dto.SearchSystemCalcDTO) ([]ds.SystemCalculation, error)

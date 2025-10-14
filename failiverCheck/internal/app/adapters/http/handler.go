@@ -72,7 +72,7 @@ func (h *Handler) RegisterUserHandlers(router *gin.RouterGroup) {
 	users.POST("/users/logout", h.LogoutUser)
 }
 func (h *Handler) RegisterSysteemCalcToComponentsHandlers(router *gin.RouterGroup) {
-	users := router.Group("", h.AuthoMiddleware(), h.SystemCalcToComponentsAccessMiddleware())
+	users := router.Group("", h.AuthoMiddleware())
 	users.DELETE("/system_calcs_to_components/", h.DeleteComponentsToSystemCalc)
 	users.PUT("/system_calcs_to_components/", h.UpdateComponentsToSystemCalc)
 }

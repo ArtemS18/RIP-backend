@@ -2,10 +2,10 @@ package http
 
 import (
 	"failiverCheck/internal/app/dto"
+	"failiverCheck/internal/app/schemas"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 // Update component in system calc
@@ -21,13 +21,21 @@ import (
 // @Failure      500  {object}  schemas.Error
 // @Router       /system_calcs_to_components/ [put]
 func (h *Handler) UpdateComponentsToSystemCalc(ctx *gin.Context) {
-	var update dto.UpdateComponentToSystemCalcDTO
+	var update schemas.UpdateComponentToSystemCalcReq
 	h.validateFields(ctx, &update)
 	if ctx.IsAborted() {
 		return
 	}
-	orm, err := h.Postgres.UpdateComponentsToSystemCalc(update)
-	new := dto.ToComponentsToSystemCalcDTO(orm)
+	userID := h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+	new, err := h.UseCase.UpdateComponentsToSystemCalc(dto.UpdateComponentToSystemCalcDTO{
+		ReplicationCount:    update.ReplicationCount,
+		ComponentID:         update.ComponentID,
+		SystemCalculationID: update.SystemCalculationID,
+		UserID:              userID,
+	})
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return
@@ -49,17 +57,20 @@ func (h *Handler) UpdateComponentsToSystemCalc(ctx *gin.Context) {
 // @Failure      500  {object}  schemas.Error
 // @Router       /system_calcs_to_components/ [delete]
 func (h *Handler) DeleteComponentsToSystemCalc(ctx *gin.Context) {
-	var ids dto.ComponentToSystemCalcByIdDTO
-	if err := ctx.BindJSON(&ids); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
+	var del schemas.ComponentToSystemCalcByIdReq
+	h.validateFields(ctx, &del)
+	if ctx.IsAborted() {
 		return
 	}
-	validate := validator.New()
-	if err := validate.Struct(ids); err != nil {
-		h.errorHandler(ctx, http.StatusBadRequest, err)
+	userID := h.GetUserID(ctx)
+	if ctx.IsAborted() {
 		return
 	}
-	err := h.UseCase.DeleteComponentsToSystemCalc(ids)
+	err := h.UseCase.DeleteComponentsToSystemCalc(dto.ComponentToSystemCalcByIdDTO{
+		ComponentID:         del.ComponentID,
+		SystemCalculationID: del.SystemCalculationID,
+		UserID:              userID,
+	})
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return

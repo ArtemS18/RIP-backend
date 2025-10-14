@@ -8,7 +8,6 @@ import (
 	"failiverCheck/internal/pkg/jwtUtils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 )
 
@@ -82,35 +81,6 @@ func (h *Handler) SystemCalcAccessMiddleware() gin.HandlerFunc {
 	}
 }
 
-func (h *Handler) SystemCalcToComponentsAccessMiddleware() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		user, err := h.GetUserDTO(ctx)
-		if err != nil {
-			h.errorHandler(ctx, http.StatusNotFound, err)
-			return
-		}
-		var ids dto.ComponentToSystemCalcByIdDTO
-		if err := ctx.BindJSON(&ids); err != nil {
-			h.errorHandler(ctx, http.StatusBadRequest, err)
-			return
-		}
-		validate := validator.New()
-		if err := validate.Struct(ids); err != nil {
-			h.errorHandler(ctx, http.StatusBadRequest, err)
-			return
-		}
-		sysCalc, err := h.UseCase.Postgres.GetComponentsToSystemCalc(ids)
-		if err != nil {
-			h.errorHandler(ctx, http.StatusNotFound, err)
-			return
-		}
-		if sysCalc.SystemCalculation.UserID != uint(user.ID) {
-			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("access denied"))
-			return
-		}
-		ctx.Next()
-	}
-}
 func (h *Handler) GetUserID(ctx *gin.Context) uint {
 	dto, err := h.GetUserDTO(ctx)
 	if err != nil {
@@ -128,6 +98,14 @@ func (h *Handler) GetUserDTO(ctx *gin.Context) (dto.UserDTO, error) {
 	user, ok := userRaw.(dto.UserDTO)
 	if !ok {
 		return dto.UserDTO{}, fmt.Errorf("invalid user id type: expected int, got %T", user)
+	}
+	return user, nil
+}
+
+func (h *Handler) GetIds(ctx *gin.Context) (dto.ComponentToSystemCalcByIdDTO, error) {
+	user, ok := ctx.MustGet("ids").(dto.ComponentToSystemCalcByIdDTO)
+	if !ok {
+		return dto.ComponentToSystemCalcByIdDTO{}, fmt.Errorf("ids not found")
 	}
 	return user, nil
 }

@@ -123,12 +123,14 @@ func ToSystemCalculationInfoListDTO(arr []ds.SystemCalculation) []SystemCalculat
 }
 
 type ComponentToSystemCalcByIdDTO struct {
-	ComponentID         uint `json:"component_id" validate:"required"`
-	SystemCalculationID uint `json:"system_calculation_id" validate:"required"`
+	ComponentID         uint
+	SystemCalculationID uint
+	UserID              uint
 }
 
 type UpdateComponentToSystemCalcDTO struct {
-	ComponentID         uint `json:"component_id"`
-	SystemCalculationID uint `json:"system_calculation_id"`
-	ReplicationCount    uint `json:"replication_count"`
+	ComponentID         uint
+	SystemCalculationID uint
+	ReplicationCount    uint
+	UserID              uint
 }

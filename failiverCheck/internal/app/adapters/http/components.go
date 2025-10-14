@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -165,7 +165,7 @@ func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 	if ctx.IsAborted() {
 		return
 	}
-	logrus.Info(userId)
+	log.Info(userId)
 	id := h.getIntParam(ctx, "id")
 	if ctx.IsAborted() {
 		return

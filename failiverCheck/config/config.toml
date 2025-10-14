@@ -11,7 +11,7 @@ expire_at_minutes = 10
 
 [redis]
 host = "localhost"
-port = 9000
+port = 6379
 dial_timeout_sec=10
 read_timeout_sec=10
 app_prefix="api:"
