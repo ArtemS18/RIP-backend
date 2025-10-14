@@ -26,3 +26,18 @@ func (r *Postgres) DeleteComponentsToSystemCalc(ids dto.ComponentToSystemCalcByI
 	}
 	return res.Error
 }
+
+func (r *Postgres) GetComponentsToSystemCalc(ids dto.ComponentToSystemCalcByIdDTO) (ds.ComponentsToSystemCalc, error) {
+	var deletedComponent ds.ComponentsToSystemCalc
+
+	res := r.db.Model(&ds.ComponentsToSystemCalc{}).Preload("SystemCalculation").Where("system_calculation_id = ? AND component_id = ?", ids.SystemCalculationID, ids.ComponentID).First(&deletedComponent)
+	return deletedComponent, res.Error
+}
+
+func (r *Postgres) CreateComponentsToSystemCalc(componentsToSystemCalc ds.ComponentsToSystemCalc) (ds.ComponentsToSystemCalc, error) {
+	err := r.db.Create(&componentsToSystemCalc).Error
+	if err != nil {
+		return componentsToSystemCalc, err
+	}
+	return componentsToSystemCalc, nil
+}

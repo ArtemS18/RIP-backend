@@ -20,16 +20,23 @@ type Postgres interface {
 
 	GetSystemCalcById(id uint) (ds.SystemCalculation, error)
 	GetSystemCalcList(dto dto.SearchSystemCalcDTO) ([]ds.SystemCalculation, error)
-	GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBucketDTO, error)
 	UpdateSystemCalcStatusToFormed(userId uint) (ds.SystemCalculation, error)
 	DeleteSystemCalc(userId uint, id uint) error
 	UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error)
 	UpdateSystemCalc(sysCalcId uint, update dto.UpdateSystemCalcDTO) (ds.SystemCalculation, error)
+	CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, error)
+	GetCountInSysCalc(sysCalcId uint) (int64, error)
+	GetSystemCalcByUserId(userId uint) (ds.SystemCalculation, error)
 
 	RegisterUser(credentials schemas.UserCredentials) (ds.User, error)
 	LogoutUser(userId uint) error
 	GetUserById(id uint) (ds.User, error)
 	UpdateUserById(id uint, update dto.UserUpdateDTO) (ds.User, error)
+
+	UpdateComponentsToSystemCalc(update dto.UpdateComponentToSystemCalcDTO) (ds.ComponentsToSystemCalc, error)
+	DeleteComponentsToSystemCalc(delete dto.ComponentToSystemCalcByIdDTO) error
+	CreateComponentsToSystemCalc(componentsToSystemCalc ds.ComponentsToSystemCalc) (ds.ComponentsToSystemCalc, error)
+	GetComponentsToSystemCalc(ids dto.ComponentToSystemCalcByIdDTO) (ds.ComponentsToSystemCalc, error)
 }
 
 type Minio interface {

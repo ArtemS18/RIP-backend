@@ -52,51 +52,13 @@ func (r *Postgres) CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, err
 	return exist_calc, nil
 
 }
-
-func (r *Postgres) AddComponentInSystemCalc(componentID uint, userId uint) error {
-	systemCal, err := r.CreateOrGetSystemCalc(userId)
-	if err != nil {
-		return err
-	}
-
-	var existing ds.ComponentsToSystemCalc
-	check := r.db.Where("component_id = ? AND system_calculation_id = ?", componentID, systemCal.ID).First(&existing)
-	if check.Error == nil {
-		return fmt.Errorf("component (id = %d) alredy added in system calculation (id = %d)", componentID, systemCal.ID)
-	}
-	if check.Error != nil && check.Error != gorm.ErrRecordNotFound {
-		return check.Error
-	}
-
-	componentsToSystemCalc := ds.ComponentsToSystemCalc{
-		ComponentID:         componentID,
-		SystemCalculationID: systemCal.ID,
-	}
-	err = r.db.Create(&componentsToSystemCalc).Error
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *Postgres) GetCurrentSysCalcAndCount(userId uint) (dto.CurrentUserBucketDTO, error) {
-	systemCalc, err := r.GetSystemCalcByUserId(userId)
-	dto := dto.CurrentUserBucketDTO{}
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return dto, nil
-		}
-		return dto, err
-	}
+func (r *Postgres) GetCountInSysCalc(sysCalcId uint) (int64, error) {
 	var count int64
-	err = r.db.Model(&ds.ComponentsToSystemCalc{}).Where("system_calculation_id = ?", systemCalc.ID).Count(&count).Error
+	err := r.db.Model(&ds.ComponentsToSystemCalc{}).Where("system_calculation_id = ?", sysCalcId).Count(&count).Error
 	if err != nil {
-		return dto, err
+		return 0, err
 	}
-	dto.SystemCalculationID = &systemCalc.ID
-	dto.ComponentsCount = uint(count)
-	return dto, nil
-
+	return count, nil
 }
 
 func (r *Postgres) DeleteSystemCalc(sysCalcId uint, userId uint) error {

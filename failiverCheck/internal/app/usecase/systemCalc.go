@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"failiverCheck/internal/app/dto"
+
+	"gorm.io/gorm"
 )
 
 func (uc *UseCase) GetSystemCalc(id uint) (dto.SystemCalculationDTO, error) {
@@ -32,9 +34,21 @@ func (uc *UseCase) GetSystemCalcList(user dto.UserDTO, filters dto.SystemCalcFil
 }
 
 func (uc *UseCase) GetSystemCalcBucket(userId uint) (dto.CurrentUserBucketDTO, error) {
-	bucket, err := uc.Postgres.GetCurrentSysCalcAndCount(userId)
+	systemCalc, err := uc.Postgres.GetSystemCalcByUserId(userId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return dto.CurrentUserBucketDTO{}, nil
+		}
+		return dto.CurrentUserBucketDTO{}, err
+	}
+
+	count, err := uc.Postgres.GetCountInSysCalc(systemCalc.ID)
 	if err != nil {
 		return dto.CurrentUserBucketDTO{}, err
+	}
+	bucket := dto.CurrentUserBucketDTO{
+		SystemCalculationID: &systemCalc.ID,
+		ComponentsCount:     uint(count),
 	}
 	return bucket, nil
 }

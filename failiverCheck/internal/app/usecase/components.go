@@ -4,8 +4,10 @@ import (
 	"context"
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 func (uc *UseCase) GetComponent(componetId int) (ds.Component, error) {
@@ -68,7 +70,27 @@ func (uc *UseCase) DeleteComponent(componentId uint) error {
 }
 
 func (uc *UseCase) AddComponentInSystemCalc(userId uint, componentId uint) error {
-	err := uc.Postgres.AddComponentInSystemCalc(componentId, userId)
+	systemCal, err := uc.Postgres.CreateOrGetSystemCalc(userId)
+	if err != nil {
+		return err
+	}
+
+	_, err = uc.Postgres.GetComponentsToSystemCalc(dto.ComponentToSystemCalcByIdDTO{
+		ComponentID:         componentId,
+		SystemCalculationID: systemCal.ID,
+	})
+	if err == nil {
+		return fmt.Errorf("component (id = %d) alredy added in system calculation (id = %d)", componentId, systemCal.ID)
+	}
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return err
+	}
+
+	componentsToSystemCalc := ds.ComponentsToSystemCalc{
+		ComponentID:         componentId,
+		SystemCalculationID: systemCal.ID,
+	}
+	_, err = uc.Postgres.CreateComponentsToSystemCalc(componentsToSystemCalc)
 	if err != nil {
 		return err
 	}

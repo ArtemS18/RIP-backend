@@ -20,7 +20,7 @@ import (
 // @Failure      404  {object}  schemas.Error
 // @Failure      500  {object}  schemas.Error
 // @Router       /system_calcs_to_components/ [put]
-func (h *Handler) UpdateComponentsToSystemCac(ctx *gin.Context) {
+func (h *Handler) UpdateComponentsToSystemCalc(ctx *gin.Context) {
 	var update dto.UpdateComponentToSystemCalcDTO
 	h.validateFields(ctx, &update)
 	if ctx.IsAborted() {
@@ -48,7 +48,7 @@ func (h *Handler) UpdateComponentsToSystemCac(ctx *gin.Context) {
 // @Failure      404  {object}  schemas.Error
 // @Failure      500  {object}  schemas.Error
 // @Router       /system_calcs_to_components/ [delete]
-func (h *Handler) DeleteComponentsToSystemCac(ctx *gin.Context) {
+func (h *Handler) DeleteComponentsToSystemCalc(ctx *gin.Context) {
 	var ids dto.ComponentToSystemCalcByIdDTO
 	if err := ctx.BindJSON(&ids); err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
@@ -59,7 +59,7 @@ func (h *Handler) DeleteComponentsToSystemCac(ctx *gin.Context) {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
 	}
-	err := h.Postgres.DeleteComponentsToSystemCalc(ids)
+	err := h.UseCase.DeleteComponentsToSystemCalc(ids)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusNotFound, err)
 		return

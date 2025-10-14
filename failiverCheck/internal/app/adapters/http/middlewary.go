@@ -8,6 +8,7 @@ import (
 	"failiverCheck/internal/pkg/jwtUtils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 )
 
@@ -74,6 +75,36 @@ func (h *Handler) SystemCalcAccessMiddleware() gin.HandlerFunc {
 			return
 		}
 		if sysCalc.UserID != uint(user.ID) {
+			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("access denied"))
+			return
+		}
+		ctx.Next()
+	}
+}
+
+func (h *Handler) SystemCalcToComponentsAccessMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		user, err := h.GetUserDTO(ctx)
+		if err != nil {
+			h.errorHandler(ctx, http.StatusNotFound, err)
+			return
+		}
+		var ids dto.ComponentToSystemCalcByIdDTO
+		if err := ctx.BindJSON(&ids); err != nil {
+			h.errorHandler(ctx, http.StatusBadRequest, err)
+			return
+		}
+		validate := validator.New()
+		if err := validate.Struct(ids); err != nil {
+			h.errorHandler(ctx, http.StatusBadRequest, err)
+			return
+		}
+		sysCalc, err := h.UseCase.Postgres.GetComponentsToSystemCalc(ids)
+		if err != nil {
+			h.errorHandler(ctx, http.StatusNotFound, err)
+			return
+		}
+		if sysCalc.SystemCalculation.UserID != uint(user.ID) {
 			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("access denied"))
 			return
 		}
