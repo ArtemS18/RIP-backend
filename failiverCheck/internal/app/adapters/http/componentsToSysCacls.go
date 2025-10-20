@@ -14,6 +14,7 @@ import (
 // @Tags         Components To SystemCalc
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param  create body dto.UpdateComponentToSystemCalcDTO true "Update schema"
 // @Success      200  {object}  dto.ComponentsToSystemCalcDTO
 // @Failure      400  {object}  schemas.Error
@@ -50,6 +51,7 @@ func (h *Handler) UpdateComponentsToSystemCalc(ctx *gin.Context) {
 // @Tags         Components To SystemCalc
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param  create body dto.ComponentToSystemCalcByIdDTO true "Delete schema"
 // @Success      200  {object}  schemas.OKResponse
 // @Failure      400  {object}  schemas.Error

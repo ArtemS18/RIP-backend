@@ -14,6 +14,7 @@ import (
 // @Tags         System caclculation
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param        id   path      int  true  "System Cacl ID"
 // @Success      200  {object}  dto.SystemCalculationDTO
 // @Failure      400  {object}  schemas.Error
@@ -40,6 +41,7 @@ func (h *Handler) GetSystemCalc(ctx *gin.Context) {
 // @Tags         System caclculation
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param        state    query     string  false  "name search by q"
 // @Param        date_formed_start    query     string  false  "2006-02-01"
 // @Param        date_formed_end    query     string  false  "2006-02-01"
@@ -73,6 +75,7 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 // @Tags         System caclculation
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}   dto.CurrentUserBucketDTO
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -98,6 +101,7 @@ func (h *Handler) GetSystemCalcBucket(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
 // @Param        update body schemas.UpdateSystemCalcFields true "Update schema"
 // @Success      200  {object}   dto.SystemCalculationDTO
 // @Failure      400  {object}  schemas.Error
@@ -129,6 +133,7 @@ func (h *Handler) UpdateSystemCalc(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
 // @Success      200  {object}   dto.SystemCalculationDTO
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -154,6 +159,7 @@ func (h *Handler) UpdateSystemCalcStatusToFormed(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
 // @Success      200  {object}   dto.SystemCalculationDTO
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -188,6 +194,7 @@ func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
 // @Success      204  {object}  schemas.OKResponse
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error

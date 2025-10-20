@@ -2,6 +2,8 @@ module failiverCheck
 
 go 1.24.6
 
+require github.com/swaggo/files v1.0.1
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
@@ -62,6 +64,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
+	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6 // indirect
 	github.com/swaggo/swag/example/celler v0.0.0-20250923075332-db83db97561a // indirect
 	github.com/tinylib/msgp v1.3.0 // indirect

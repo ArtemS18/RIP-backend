@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "failiverCheck/docs"
 	"failiverCheck/internal/app/adapters/http"
 	"failiverCheck/internal/app/config"
 	"failiverCheck/internal/app/dsn"
@@ -17,7 +18,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// @title           Swagger Example API
+// @title           FailiverCheck API
 // @version         1.0
 // @description     This is a sample server celler server.
 // @termsOfService  http://swagger.io/terms/
@@ -29,9 +30,11 @@ import (
 // @license.name  MIT
 
 // @host      localhost:8080
-// @BasePath  /api/
+// @BasePath  /api
 
-// @securityDefinitions.basic  BasicAuth
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/

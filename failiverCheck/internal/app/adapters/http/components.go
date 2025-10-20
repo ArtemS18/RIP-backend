@@ -102,6 +102,7 @@ func (h *Handler) UpdateComponent(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param  create body dto.CreateComponentDTO true "Create component schema"
+// @Security     BearerAuth
 // @Success      200  {object}  ds.Component
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -129,6 +130,7 @@ func (h *Handler) CreateComponent(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id    path     int  true "Component ID"
+// @Security     BearerAuth
 // @Success      204  {object}  nil
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -154,6 +156,7 @@ func (h *Handler) DeleteComponent(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id    path     int  true "Component ID"
+// @Security     BearerAuth
 // @Success      204  {object}  nil
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -185,6 +188,7 @@ func (h *Handler) AddComponentInSystemCalc(ctx *gin.Context) {
 // @Accept       multipart/form-data
 // @Produce      json
 // @Param        id          path     int                         true "Component ID"
+// @Security     BearerAuth
 // @Param         img formData file true "image"
 // @Success      200         {object}  map[string]string
 // @Failure      400         {object}  schemas.Error

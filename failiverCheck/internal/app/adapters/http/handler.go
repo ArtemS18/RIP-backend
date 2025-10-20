@@ -6,6 +6,9 @@ import (
 	"failiverCheck/internal/app/repository/postgres"
 	"failiverCheck/internal/app/usecase"
 
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,11 +27,16 @@ func NewHandler(pg *postgres.Postgres, m *minio.Minio, uc *usecase.UseCase, c *c
 func (h *Handler) RegisterHandlers(e *gin.Engine) {
 
 	public := e.Group("/api")
+	h.RegisterSwaggerHandlers(e)
 	h.RegisterUserHandlers(public)
 	h.RegisterComponentHandlers(public)
 	h.RegisterSystemCalcHandlers(public)
 	h.RegisterSysteemCalcToComponentsHandlers(public)
 
+}
+
+func (h *Handler) RegisterSwaggerHandlers(e *gin.Engine) {
+	e.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.PersistAuthorization(true)))
 }
 
 func (h *Handler) RegisterComponentHandlers(router *gin.RouterGroup) {

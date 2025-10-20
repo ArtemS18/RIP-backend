@@ -67,6 +67,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a component",
                 "consumes": [
                     "application/json"
@@ -176,6 +181,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a component by id",
                 "consumes": [
                     "application/json"
@@ -223,6 +233,11 @@ const docTemplate = `{
         },
         "/components/{id}/img": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update component image",
                 "consumes": [
                     "multipart/form-data"
@@ -283,6 +298,11 @@ const docTemplate = `{
         },
         "/components/{id}/system_calc/": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add component in system caclulation",
                 "consumes": [
                     "application/json"
@@ -330,6 +350,11 @@ const docTemplate = `{
         },
         "/system_calcs/": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get system cacl in",
                 "consumes": [
                     "application/json"
@@ -394,6 +419,11 @@ const docTemplate = `{
         },
         "/system_calcs/my_bucket": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get user bucket system cac",
                 "consumes": [
                     "application/json"
@@ -435,6 +465,11 @@ const docTemplate = `{
         },
         "/system_calcs/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get system cacl by id",
                 "consumes": [
                     "application/json"
@@ -483,6 +518,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "update system cacl by id",
                 "consumes": [
                     "application/json"
@@ -540,6 +580,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete system calc by id",
                 "consumes": [
                     "application/json"
@@ -590,6 +635,11 @@ const docTemplate = `{
         },
         "/system_calcs/{id}/status": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Moderate system calc, update status by id",
                 "consumes": [
                     "application/json"
@@ -640,6 +690,11 @@ const docTemplate = `{
         },
         "/system_calcs/{id}/status_formed": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update system calc status to FORMED by id",
                 "consumes": [
                     "application/json"
@@ -690,6 +745,11 @@ const docTemplate = `{
         },
         "/system_calcs_to_components/": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update component in system calc",
                 "consumes": [
                     "application/json"
@@ -740,6 +800,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete component in system calc",
                 "consumes": [
                     "application/json"
@@ -841,6 +906,11 @@ const docTemplate = `{
         },
         "/users/logout": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Logout User",
                 "consumes": [
                     "application/json"
@@ -879,6 +949,11 @@ const docTemplate = `{
         },
         "/users/me": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Show current User",
                 "consumes": [
                     "application/json"
@@ -918,6 +993,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update current User",
                 "consumes": [
                     "application/json"
@@ -1075,15 +1155,14 @@ const docTemplate = `{
         },
         "dto.ComponentToSystemCalcByIdDTO": {
             "type": "object",
-            "required": [
-                "component_id",
-                "system_calculation_id"
-            ],
             "properties": {
-                "component_id": {
+                "componentID": {
                     "type": "integer"
                 },
-                "system_calculation_id": {
+                "systemCalculationID": {
+                    "type": "integer"
+                },
+                "userID": {
                     "type": "integer"
                 }
             }
@@ -1236,13 +1315,16 @@ const docTemplate = `{
         "dto.UpdateComponentToSystemCalcDTO": {
             "type": "object",
             "properties": {
-                "component_id": {
+                "componentID": {
                     "type": "integer"
                 },
-                "replication_count": {
+                "replicationCount": {
                     "type": "integer"
                 },
-                "system_calculation_id": {
+                "systemCalculationID": {
+                    "type": "integer"
+                },
+                "userID": {
                     "type": "integer"
                 }
             }
@@ -1320,8 +1402,10 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     },
     "externalDocs": {
@@ -1334,9 +1418,9 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/",
+	BasePath:         "/api",
 	Schemes:          []string{},
-	Title:            "Swagger Example API",
+	Title:            "FailiverCheck API",
 	Description:      "This is a sample server celler server.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

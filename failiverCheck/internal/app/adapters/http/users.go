@@ -68,6 +68,7 @@ func (h *Handler) AuthUser(ctx *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Success      204  {object}  nil
+// @Security     BearerAuth
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
 // @Failure      500  {object}  schemas.Error
@@ -93,6 +94,7 @@ func (h *Handler) LogoutUser(ctx *gin.Context) {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {object}  dto.UserDTO
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
@@ -120,6 +122,7 @@ func (h *Handler) GetUser(ctx *gin.Context) {
 // @Produce      json
 // @Param  update body dto.UserUpdateDTO true "User Update"
 // @Success      200  {object}  dto.UserDTO
+// @Security     BearerAuth
 // @Failure      400  {object}  schemas.Error
 // @Failure      404  {object}  schemas.Error
 // @Failure      500  {object}  schemas.Error

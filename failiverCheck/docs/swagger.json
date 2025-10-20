@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "This is a sample server celler server.",
-        "title": "Swagger Example API",
+        "title": "FailiverCheck API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
@@ -15,7 +15,7 @@
         "version": "1.0"
     },
     "host": "localhost:8080",
-    "basePath": "/api/",
+    "basePath": "/api",
     "paths": {
         "/components/": {
             "get": {
@@ -61,6 +61,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a component",
                 "consumes": [
                     "application/json"
@@ -170,6 +175,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a component by id",
                 "consumes": [
                     "application/json"
@@ -217,6 +227,11 @@
         },
         "/components/{id}/img": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update component image",
                 "consumes": [
                     "multipart/form-data"
@@ -277,6 +292,11 @@
         },
         "/components/{id}/system_calc/": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Add component in system caclulation",
                 "consumes": [
                     "application/json"
@@ -324,6 +344,11 @@
         },
         "/system_calcs/": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get system cacl in",
                 "consumes": [
                     "application/json"
@@ -388,6 +413,11 @@
         },
         "/system_calcs/my_bucket": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get user bucket system cac",
                 "consumes": [
                     "application/json"
@@ -429,6 +459,11 @@
         },
         "/system_calcs/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "get system cacl by id",
                 "consumes": [
                     "application/json"
@@ -477,6 +512,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "update system cacl by id",
                 "consumes": [
                     "application/json"
@@ -534,6 +574,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete system calc by id",
                 "consumes": [
                     "application/json"
@@ -584,6 +629,11 @@
         },
         "/system_calcs/{id}/status": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Moderate system calc, update status by id",
                 "consumes": [
                     "application/json"
@@ -634,6 +684,11 @@
         },
         "/system_calcs/{id}/status_formed": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update system calc status to FORMED by id",
                 "consumes": [
                     "application/json"
@@ -684,6 +739,11 @@
         },
         "/system_calcs_to_components/": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update component in system calc",
                 "consumes": [
                     "application/json"
@@ -734,6 +794,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete component in system calc",
                 "consumes": [
                     "application/json"
@@ -835,6 +900,11 @@
         },
         "/users/logout": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Logout User",
                 "consumes": [
                     "application/json"
@@ -873,6 +943,11 @@
         },
         "/users/me": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Show current User",
                 "consumes": [
                     "application/json"
@@ -912,6 +987,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update current User",
                 "consumes": [
                     "application/json"
@@ -1069,15 +1149,14 @@
         },
         "dto.ComponentToSystemCalcByIdDTO": {
             "type": "object",
-            "required": [
-                "component_id",
-                "system_calculation_id"
-            ],
             "properties": {
-                "component_id": {
+                "componentID": {
                     "type": "integer"
                 },
-                "system_calculation_id": {
+                "systemCalculationID": {
+                    "type": "integer"
+                },
+                "userID": {
                     "type": "integer"
                 }
             }
@@ -1230,13 +1309,16 @@
         "dto.UpdateComponentToSystemCalcDTO": {
             "type": "object",
             "properties": {
-                "component_id": {
+                "componentID": {
                     "type": "integer"
                 },
-                "replication_count": {
+                "replicationCount": {
                     "type": "integer"
                 },
-                "system_calculation_id": {
+                "systemCalculationID": {
+                    "type": "integer"
+                },
+                "userID": {
                     "type": "integer"
                 }
             }
@@ -1314,8 +1396,10 @@
         }
     },
     "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     },
     "externalDocs": {
