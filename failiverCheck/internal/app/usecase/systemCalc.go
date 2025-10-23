@@ -21,6 +21,8 @@ func (uc *UseCase) GetSystemCalcList(user dto.UserDTO, filters dto.SystemCalcFil
 		DateFormedStart: filters.DateFormedStart,
 		DateFormedEnd:   filters.DateFormedEnd,
 		Status:          filters.Status,
+		Limit:           filters.Limit,
+		Offset:          filters.Offset,
 	}
 	if !user.IsModerator {
 		searchDto.UserID = &user.ID

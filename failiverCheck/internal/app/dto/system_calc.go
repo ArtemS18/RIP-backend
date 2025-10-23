@@ -14,6 +14,8 @@ type SystemCalcFilters struct {
 	DateFormedStart *string    `form:"date_formed_start"`
 	DateFormedEnd   *string    `form:"date_formed_end"`
 	Status          *ds.Status `form:"status"`
+	Limit           int
+	Offset          int
 }
 
 type SearchSystemCalcDTO struct {
@@ -21,6 +23,8 @@ type SearchSystemCalcDTO struct {
 	DateFormedEnd   *string    `form:"date_formed_end"`
 	Status          *ds.Status `form:"status"`
 	UserID          *uint      `form:"-"`
+	Limit           int        `form:"-"`
+	Offset          int        `form:"-"`
 }
 
 type UpdateSystemCalcDTO struct {

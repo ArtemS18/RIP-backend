@@ -11,8 +11,7 @@ import (
 type Postgres interface {
 	GetUserByLogin(login string) (ds.User, error)
 	GetComponentById(id int) (ds.Component, error)
-	GetComponents() ([]ds.Component, error)
-	GetComponentsByTitle(title string) ([]ds.Component, error)
+	GetComponents(filters dto.ComponentsFiltersDTO) ([]ds.Component, error)
 	UpdateComponentById(id uint, update dto.UpdateComponentDTO) (ds.Component, error)
 	CreateComponent(create dto.CreateComponentDTO) (ds.Component, error)
 	DeletedComponentById(id uint) error

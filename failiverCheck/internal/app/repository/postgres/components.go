@@ -8,9 +8,15 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (r *Postgres) GetComponents() ([]ds.Component, error) {
+func (r *Postgres) GetComponents(filters dto.ComponentsFiltersDTO) ([]ds.Component, error) {
 	var components []ds.Component
-	err := r.db.Where("is_deleted = ?", false).Find(&components).Error
+	q := r.db.Where("is_deleted = ?", false)
+	if filters.Title != "" {
+		q = q.Where("title ILIKE ?", "%"+filters.Title+"%")
+	}
+	q = q.Limit(filters.Limit).Offset(filters.Offset)
+
+	err := q.Find(&components).Error
 	if err != nil {
 		return nil, err
 	}

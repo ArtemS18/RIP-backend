@@ -25,7 +25,6 @@ func NewHandler(pg *postgres.Postgres, m *minio.Minio, uc *usecase.UseCase, c *c
 }
 
 func (h *Handler) RegisterHandlers(e *gin.Engine) {
-
 	public := e.Group("/api")
 	h.RegisterSwaggerHandlers(e)
 	h.RegisterUserHandlers(public)

@@ -4,8 +4,10 @@ import (
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 // Show an system calc
@@ -56,6 +58,22 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 		h.errorHandler(ctx, http.StatusBadRequest, errQ)
 		return
 	}
+	limitQuery := ctx.Query("limit")
+	offsetQuery := ctx.Query("offset")
+
+	limit, err := strconv.Atoi(limitQuery)
+	if err != nil {
+		limit = 5
+	}
+	offset, err := strconv.Atoi(offsetQuery)
+	if err != nil {
+		offset = 0
+	}
+	filters.Limit = limit
+	filters.Offset = offset
+
+	logrus.Info(filters.Limit, filters.Offset)
+
 	user, err := h.GetUserDTO(ctx)
 	if err != nil {
 		h.errorHandler(ctx, 404, err)

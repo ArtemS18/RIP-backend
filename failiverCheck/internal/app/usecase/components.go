@@ -19,20 +19,12 @@ func (uc *UseCase) GetComponent(componetId int) (ds.Component, error) {
 	return component, nil
 }
 
-func (uc *UseCase) GetComponents(searchQuery string) ([]ds.Component, error) {
+func (uc *UseCase) GetComponents(filters dto.ComponentsFiltersDTO) ([]ds.Component, error) {
 	var components []ds.Component
 	var err error
-	log.Info(searchQuery)
-	if searchQuery == "" {
-		components, err = uc.Postgres.GetComponents()
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		components, err = uc.Postgres.GetComponentsByTitle(searchQuery)
-		if err != nil {
-			return nil, err
-		}
+	components, err = uc.Postgres.GetComponents(filters)
+	if err != nil {
+		return nil, err
 	}
 	return components, nil
 }

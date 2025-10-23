@@ -43,7 +43,7 @@ func (h *Handler) ModeratorValidateMiddleware() gin.HandlerFunc {
 			h.errorHandler(ctx, 401, err)
 			return
 		}
-		logrus.Error(user.ID, user.IsModerator, user.Login)
+		logrus.Info(user.ID, user.IsModerator, user.Login)
 		if !user.IsModerator {
 			h.errorHandler(ctx, http.StatusForbidden, fmt.Errorf("not allowed role"))
 		}

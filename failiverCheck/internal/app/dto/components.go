@@ -31,6 +31,12 @@ type ComponentsToSystemCalcDTO struct {
 	Component        *ComponentInSystemCalcDTO `json:"component"`
 }
 
+type ComponentsFiltersDTO struct {
+	Title  string
+	Limit  int
+	Offset int
+}
+
 func ToComponentDTO(orm ds.Component) ComponentInSystemCalcDTO {
 	dto := ComponentInSystemCalcDTO{
 		ID:    orm.ID,

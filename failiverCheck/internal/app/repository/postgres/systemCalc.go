@@ -108,7 +108,7 @@ func (r *Postgres) GetSystemCalcList(filters dto.SearchSystemCalcDTO) ([]ds.Syst
 		query = query.Where("date(date_formed) <= ?", e)
 	}
 
-	err := query.Find(&sys_cacls).Error
+	err := query.Limit(filters.Limit).Offset(filters.Offset).Find(&sys_cacls).Error
 
 	if err != nil {
 		return nil, err

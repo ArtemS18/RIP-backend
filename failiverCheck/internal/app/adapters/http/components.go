@@ -5,6 +5,7 @@ import (
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -52,10 +53,28 @@ func (h *Handler) GetComponent(ctx *gin.Context) {
 func (h *Handler) GetComponents(ctx *gin.Context) {
 	var components []ds.Component
 	var err error
+
 	searchQuery := ctx.Query("search")
+	limitQuery := ctx.Query("limit")
+	offsetQuery := ctx.Query("offset")
+
+	limit, err := strconv.Atoi(limitQuery)
+	if err != nil {
+		limit = 5
+	}
+	offset, err := strconv.Atoi(offsetQuery)
+	if err != nil {
+		offset = 0
+	}
+
+	filters := dto.ComponentsFiltersDTO{
+		Title:  searchQuery,
+		Limit:  limit,
+		Offset: offset,
+	}
 
 	log.Info(searchQuery)
-	components, err = h.UseCase.GetComponents(searchQuery)
+	components, err = h.UseCase.GetComponents(filters)
 	if err != nil {
 		h.errorHandler(ctx, http.StatusBadRequest, err)
 		return
