@@ -54,7 +54,7 @@ func (h *Handler) GetComponents(ctx *gin.Context) {
 	var components []ds.Component
 	var err error
 
-	searchQuery := ctx.Query("search")
+	searchQuery := ctx.Query("title")
 	limitQuery := ctx.Query("limit")
 	offsetQuery := ctx.Query("offset")
 

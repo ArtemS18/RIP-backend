@@ -49,7 +49,7 @@ func main() {
 	configCORS := cors.DefaultConfig()
 	configCORS.AllowOrigins = []string{"*"}
 	configCORS.AllowMethods = []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"}
-	//configCORS.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
+	configCORS.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
 	router.Use(cors.New(configCORS))
 	dsnPg := dsn.LoadEnv()
 	fmt.Println(dsnPg)
