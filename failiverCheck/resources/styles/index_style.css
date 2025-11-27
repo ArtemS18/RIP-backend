@@ -1,0 +1,233 @@
+body{
+    font-family: 'Inter';
+    position: relative;
+    background-color: #0D1117;
+    color: #D1D7E1;
+    font-size: 25px;
+    margin: 0px;
+    font-weight: bold;
+}
+.bar{
+    display: flex;
+    position: sticky;
+    top: 0px;
+    
+    background-color: #0D1117;
+    z-index: 1000;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 55px;
+    padding: 10px;
+    align-items: center;
+    text-decoration: none;
+    width: calc(100vw- 2px);
+    border-bottom: 2px solid #404C5B;
+}
+.bar a{
+    text-decoration: none;
+    color: #D1D7E1;
+    margin: 20px;
+}
+header img { 
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+}
+
+.page{
+    padding: 20px;
+    margin: auto;
+    max-width: 1200px;
+    display: flex;
+
+    
+    flex-direction: column;
+    gap: 5px;
+    font-size: 1em;
+}
+
+.page input{
+    width: 100%;
+    height: 57px;
+    font-size: 25px;
+    font-family: 'Inter';
+    padding: 10px;
+    padding-left: 15px;
+    background-color: #212830;
+    border-top-left-radius: 20px; 
+    border-bottom-left-radius: 20px;
+    color: #55667B;
+    border: 2px solid #404C5B;
+}
+
+input{
+    transition: 0.1s ease; 
+}
+input:focus {
+  outline: 1px solid #D1D7E1; /* Заменяет стандартную рамку синей */
+  box-shadow: #d1d7e17a, 0px, 0px, 10px;
+  border-color: #D1D7E1;
+}
+
+form{
+    display: flex;
+    flex-direction: row;
+}
+p{
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+
+.page h2 {
+    color: #333;
+    margin-top: 20px;
+}
+.component-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 300px);
+    gap: 30px calc(5vh);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.component{
+    max-width: 310px;
+    max-height: 380px;
+    background-color: #212830;
+    border-radius: 5px;
+    padding: 20px 20px 10px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; 
+    border: 2px solid #404C5B;
+    font-size: 1em;
+    
+}
+#img-icon{
+    height: max-content;
+    position: relative;
+    text-align: center;
+    
+}
+#img-icon img{
+    width: 150px;
+    height: 100px;
+    color: #404C5B;
+}
+.buttons {
+    bottom: 10px;
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+}
+.button {
+    /* min-width: 120px;
+    min-height: 45px; */
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    font-size: 0.6em;
+    text-decoration: none;
+    transition: 0.5s ease;
+    height: fit-content;
+}
+
+.button.search{
+    border: 2px solid #404C5B;
+    color: #55667B;
+    border-radius: 0px;
+    border-top-right-radius: 25px;
+    font-size: large;
+    border-bottom-right-radius: 25px;
+    height: auto;
+
+}
+
+.button.search:hover {
+  background-color: #D1D7E1;
+  color:#0D1117;
+  transform: scale(1.1);
+  border-color: #D1D7E1;
+}
+input{
+    transition: 0.1s ease; 
+    
+}
+input:focus { 
+  box-shadow: #d1d7e1, 0px, 0px, 20px;
+  border-color: #D1D7E1;
+}
+
+.button.add{
+    border: 1px solid #68E968;
+    color: #68E968;
+
+}
+
+.button.add:hover {
+  background-color: #68E968;
+  color:#0D1117;
+  transform: scale(1.1);
+}
+
+
+.button.more{
+    border: 1px solid #404C5B;
+    color: #404C5B;
+}
+
+.button.more:hover {
+  background-color: #D1D7E1;
+  color:#0D1117;
+  transform: scale(1.1);
+}
+
+.bar-chat{
+    width: 150px;
+    position: fixed;
+    bottom: -20px;
+    left: 30px;
+    cursor: pointer;
+    height: 150px;
+}
+
+
+.bar-chat img{
+    width: 100px;
+    display: inline;
+}
+
+.bar-chat div{
+    text-align: center;
+    min-width: 30px;
+    position: fixed;
+    padding: 10px;
+    bottom: 100px;
+    left: 100px;
+    border-radius: 100px;
+    background-color: #f94040;
+}
+.bar-chat img{
+    transition: 0.5s ease;
+}
+
+.bar-chat img:hover{
+    transform: scale(1.1);
+}
+
+.add-form{
+    margin-block-end: 0px;
+}
+
+.disable{
+    background-color: #d1d7e100;
+}
+.bar-chat.disable img:hover{
+    transform: none;
+}
+.bar-chat.disable{
+    cursor:default;
+}

@@ -1,0 +1,909 @@
+basePath: /api
+definitions:
+  ds.Component:
+    properties:
+      available:
+        type: number
+      description:
+        type: string
+      id:
+        type: integer
+      img:
+        type: string
+      mtbf:
+        type: integer
+      mttr:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  ds.User:
+    properties:
+      is_moderator:
+        type: boolean
+      login:
+        type: string
+    type: object
+  dto.ComponentInSystemCalcDTO:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  dto.ComponentToSystemCalcByIdDTO:
+    properties:
+      componentID:
+        type: integer
+      systemCalculationID:
+        type: integer
+      userID:
+        type: integer
+    type: object
+  dto.ComponentsToSystemCalcDTO:
+    properties:
+      component:
+        $ref: '#/definitions/dto.ComponentInSystemCalcDTO'
+      replication_count:
+        type: integer
+    type: object
+  dto.CreateComponentDTO:
+    properties:
+      description:
+        type: string
+      mtbf:
+        type: integer
+      mttr:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+    required:
+    - description
+    - mtbf
+    - mttr
+    - title
+    - type
+    type: object
+  dto.CurrentUserBucketDTO:
+    properties:
+      components_count:
+        type: integer
+      sys_calculation_id:
+        type: integer
+    type: object
+  dto.SystemCalculationDTO:
+    properties:
+      available_calculation:
+        type: number
+      components:
+        items:
+          $ref: '#/definitions/dto.ComponentsToSystemCalcDTO'
+        type: array
+      date_accepted:
+        type: string
+      date_created:
+        type: string
+      date_formed:
+        type: string
+      id:
+        type: integer
+      moderator:
+        type: string
+      status:
+        type: string
+      system_name:
+        type: string
+      user:
+        type: string
+    type: object
+  dto.SystemCalculationInfoDTO:
+    properties:
+      available_calculation:
+        type: number
+      date_accepted:
+        type: string
+      date_created:
+        type: string
+      date_formed:
+        type: string
+      id:
+        type: integer
+      moderator:
+        type: string
+      status:
+        type: string
+      system_name:
+        type: string
+      user:
+        type: string
+    type: object
+  dto.UpdateComponentDTO:
+    properties:
+      available:
+        type: number
+      description:
+        type: string
+      img:
+        type: string
+      mtbf:
+        type: integer
+      mttr:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.UpdateComponentToSystemCalcDTO:
+    properties:
+      componentID:
+        type: integer
+      replicationCount:
+        type: integer
+      systemCalculationID:
+        type: integer
+      userID:
+        type: integer
+    type: object
+  dto.UserDTO:
+    properties:
+      id:
+        type: integer
+      is_moderator:
+        type: boolean
+      login:
+        type: string
+    type: object
+  dto.UserUpdateDTO:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    type: object
+  schemas.Error:
+    properties:
+      description:
+        type: string
+      status:
+        type: string
+    type: object
+  schemas.OKResponse:
+    properties:
+      data: {}
+      status:
+        type: string
+    type: object
+  schemas.UpdateSystemCalcFields:
+    properties:
+      system_name:
+        type: string
+    required:
+    - system_name
+    type: object
+  schemas.UserCredentials:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server celler server.
+  license:
+    name: MIT
+  termsOfService: http://swagger.io/terms/
+  title: FailiverCheck API
+  version: "1.0"
+paths:
+  /components/:
+    get:
+      consumes:
+      - application/json
+      description: Show a components list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/ds.Component'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Show a components list
+      tags:
+      - Components
+    post:
+      consumes:
+      - application/json
+      description: Create a component
+      parameters:
+      - description: Create component schema
+        in: body
+        name: create
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateComponentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.Component'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Create a component
+      tags:
+      - Components
+  /components/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a component by id
+      parameters:
+      - description: Component ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Delete a component by id
+      tags:
+      - Components
+    get:
+      consumes:
+      - application/json
+      description: Show a component by id
+      parameters:
+      - description: Component ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update component schema
+        in: body
+        name: update
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateComponentDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.Component'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Show a component by id
+      tags:
+      - Components
+  /components/{id}/img:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Update component image
+      parameters:
+      - description: Component ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: image
+        in: formData
+        name: img
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Update component image
+      tags:
+      - Components
+  /components/{id}/system_calc/:
+    post:
+      consumes:
+      - application/json
+      description: Add component in system caclulation
+      parameters:
+      - description: Component ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Add component in system caclulation
+      tags:
+      - Components
+  /system_calcs/:
+    get:
+      consumes:
+      - application/json
+      description: get system cacl in
+      parameters:
+      - description: name search by q
+        in: query
+        name: state
+        type: string
+      - description: "2006-02-01"
+        in: query
+        name: date_formed_start
+        type: string
+      - description: "2006-02-01"
+        in: query
+        name: date_formed_end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SystemCalculationInfoDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Show an system calc list
+      tags:
+      - System caclculation
+  /system_calcs/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete system calc by id
+      parameters:
+      - description: System Cacl ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/schemas.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Delete system calc by id
+      tags:
+      - System caclculation
+    get:
+      consumes:
+      - application/json
+      description: get system cacl by id
+      parameters:
+      - description: System Cacl ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SystemCalculationDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Show an system calc
+      tags:
+      - System caclculation
+    put:
+      consumes:
+      - application/json
+      description: update system cacl by id
+      parameters:
+      - description: System Cacl ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update schema
+        in: body
+        name: update
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UpdateSystemCalcFields'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SystemCalculationDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Update system calc by id
+      tags:
+      - System caclculation
+  /system_calcs/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Moderate system calc, update status by id
+      parameters:
+      - description: System Cacl ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SystemCalculationDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Moderate system calc
+      tags:
+      - System caclculation
+  /system_calcs/{id}/status_formed:
+    put:
+      consumes:
+      - application/json
+      description: Update system calc status to FORMED by id
+      parameters:
+      - description: System Cacl ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SystemCalculationDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Update system calc status to FORMED by id
+      tags:
+      - System caclculation
+  /system_calcs/my_bucket:
+    get:
+      consumes:
+      - application/json
+      description: get user bucket system cac
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CurrentUserBucketDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Show user bucket
+      tags:
+      - System caclculation
+  /system_calcs_to_components/:
+    delete:
+      consumes:
+      - application/json
+      description: Delete component in system calc
+      parameters:
+      - description: Delete schema
+        in: body
+        name: create
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ComponentToSystemCalcByIdDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.OKResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Delete component in system calc
+      tags:
+      - Components To SystemCalc
+    put:
+      consumes:
+      - application/json
+      description: Update component in system calc
+      parameters:
+      - description: Update schema
+        in: body
+        name: create
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateComponentToSystemCalcDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ComponentsToSystemCalcDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Update component in system calc
+      tags:
+      - Components To SystemCalc
+  /users/auth:
+    post:
+      consumes:
+      - application/json
+      description: Autho User
+      parameters:
+      - description: User Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Autho User
+      tags:
+      - Users
+  /users/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout User
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Logout User
+      tags:
+      - Users
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      description: Show current User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Show current User
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update current User
+      parameters:
+      - description: User Update
+        in: body
+        name: update
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      security:
+      - BearerAuth: []
+      summary: Update current User
+      tags:
+      - Users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register User
+      parameters:
+      - description: User Credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/ds.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/schemas.Error'
+      summary: Register User
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

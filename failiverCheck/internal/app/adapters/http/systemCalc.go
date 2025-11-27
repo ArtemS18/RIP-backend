@@ -1,0 +1,236 @@
+package http
+
+import (
+	"failiverCheck/internal/app/dto"
+	"failiverCheck/internal/app/schemas"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+)
+
+// Show an system calc
+// @Summary      Show an system calc
+// @Description  get system cacl by id
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      int  true  "System Cacl ID"
+// @Success      200  {object}  dto.SystemCalculationDTO
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/{id} [get]
+func (h *Handler) GetSystemCalc(ctx *gin.Context) {
+	id := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
+		return
+	}
+	systemCalc, err := h.UseCase.GetSystemCalc(uint(id))
+	if err != nil {
+		h.errorHandler(ctx, 404, err)
+		return
+	}
+
+	h.successHandler(ctx, 200, systemCalc)
+}
+
+// Show an system calc list
+// @Summary      Show an system calc list
+// @Description  get system cacl in
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        state    query     string  false  "name search by q"
+// @Param        date_formed_start    query     string  false  "2006-02-01"
+// @Param        date_formed_end    query     string  false  "2006-02-01"
+// @Success      200  {array}   dto.SystemCalculationInfoDTO
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/ [get]
+func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
+	var filters dto.SystemCalcFilters
+	if errQ := ctx.BindQuery(&filters); errQ != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, errQ)
+		return
+	}
+	limitQuery := ctx.Query("limit")
+	offsetQuery := ctx.Query("offset")
+
+	limit, err := strconv.Atoi(limitQuery)
+	if err != nil {
+		limit = 5
+	}
+	offset, err := strconv.Atoi(offsetQuery)
+	if err != nil {
+		offset = 0
+	}
+	filters.Limit = limit
+	filters.Offset = offset
+
+	logrus.Info(filters.Limit, filters.Offset)
+
+	user, err := h.GetUserDTO(ctx)
+	if err != nil {
+		h.errorHandler(ctx, 404, err)
+		return
+	}
+	sysCalcs, err := h.UseCase.GetSystemCalcList(user, filters)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusNotFound, err)
+		return
+	}
+	h.successHandler(ctx, http.StatusOK, sysCalcs)
+}
+
+// Show user bucket
+// @Summary      Show user bucket
+// @Description  get user bucket system cac
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}   dto.CurrentUserBucketDTO
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/my_bucket [get]
+func (h *Handler) GetSystemCalcBucket(ctx *gin.Context) {
+	var userId uint = h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+	bucket, err := h.UseCase.GetSystemCalcBucket(userId)
+	if err != nil {
+		h.errorHandler(ctx, 400, err)
+		return
+	}
+	h.successHandler(ctx, http.StatusOK, bucket)
+}
+
+// Update system calc by id
+// @Summary      Update system calc by id
+// @Description  update system cacl by id
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
+// @Param        update body schemas.UpdateSystemCalcFields true "Update schema"
+// @Success      200  {object}   dto.SystemCalculationDTO
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/{id} [put]
+func (h *Handler) UpdateSystemCalc(ctx *gin.Context) {
+	sysCalcId := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
+		return
+	}
+	var data schemas.UpdateSystemCalcFields
+	h.validateFields(ctx, &data)
+	if ctx.IsAborted() {
+		return
+	}
+	system, err := h.UseCase.UpdateSystemCalc(uint(sysCalcId), dto.UpdateSystemCalcDTO{SystemName: data.SystemName})
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
+	}
+	h.successHandler(ctx, 200, system)
+}
+
+// Update system calc status to FORMED by id
+// @Summary       Update system calc status to FORMED by id
+// @Description   Update system calc status to FORMED by id
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
+// @Success      200  {object}   dto.SystemCalculationDTO
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/{id}/status_formed [put]
+func (h *Handler) UpdateSystemCalcStatusToFormed(ctx *gin.Context) {
+	sysCalcId := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
+		return
+	}
+	system, err := h.UseCase.UpdateSystemCalcStatusToFormed(uint(sysCalcId))
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
+	}
+	h.successHandler(ctx, 200, system)
+}
+
+// Moderate system calc, update status by id
+// @Summary       Moderate system calc
+// @Description   Moderate system calc, update status by id
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
+// @Success      200  {object}   dto.SystemCalculationDTO
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/{id}/status [put]
+func (h *Handler) UpdateSystemCalcStatusModerator(ctx *gin.Context) {
+	moderatorId := h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+	sysCalcId := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
+		return
+	}
+	var data schemas.UpdateSystemCalcStatus
+	h.validateFields(ctx, &data)
+	if ctx.IsAborted() {
+		return
+	}
+	system, err := h.UseCase.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, data.Command)
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
+	}
+	h.successHandler(ctx, 200, system)
+}
+
+// Delete system calc by id
+// @Summary       Delete system calc by id
+// @Description   Delete system calc by id
+// @Tags         System caclculation
+// @Accept       json
+// @Produce      json
+// @Param        id    path     int  true "System Cacl ID"
+// @Security     BearerAuth
+// @Success      204  {object}  schemas.OKResponse
+// @Failure      400  {object}  schemas.Error
+// @Failure      404  {object}  schemas.Error
+// @Failure      500  {object}  schemas.Error
+// @Router       /system_calcs/{id} [delete]
+func (h *Handler) DeleteSystemCalc(ctx *gin.Context) {
+	sysCalcId := h.getIntParam(ctx, "id")
+	if ctx.IsAborted() {
+		return
+	}
+	userId := h.GetUserID(ctx)
+	if ctx.IsAborted() {
+		return
+	}
+	err := h.UseCase.DeleteSystemCalc(userId, uint(sysCalcId))
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
+	}
+	h.successHandler(ctx, 204, nil)
+}

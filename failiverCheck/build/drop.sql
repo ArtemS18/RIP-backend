@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS components CASCADE;
+DROP TABLE IF EXISTS system_calculations CASCADE;
+DROP TABLE IF EXISTS components_to_system_calcs CASCADE;
+DROP TYPE IF EXISTS enum_status;

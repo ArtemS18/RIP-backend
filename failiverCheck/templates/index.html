@@ -1,0 +1,60 @@
+<html lang="en">
+    <header>
+        <!-- <a href="/hello"><img src="/static/svg/home.svg" alt="home"></a> -->
+        <link rel="stylesheet" href="/static/styles/index_style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </header>
+    <body>
+        <div class="bar">
+            <a href="/components"> FailiverCheck</a>
+            <!-- <span class="nav">
+                <a href="/hello">Компоненты</a>
+                <a href="">Заявки</a>
+            </span> -->
+
+        </div>
+        <div class="page">
+            <h1> Компоненты системы</h1>
+            <form action="/components" method="GET">
+                <input type="text" name="search" placeholder="Найти компоненты" value="{{ .data.SearchQuery }}">
+                <button class = "button search" type="submit"><strong>Поиск</strong></button>
+            </form>
+            <div class="component-container">
+            {{ range .data.Components}}
+                <div class="component">
+                    <div id="img-icon">
+                        <img src= "{{.Img}}" alt="icon"/>
+                    </div>
+                    <p> {{ .Title }}</p>
+                    <div class="buttons">
+                        <form action="/components/" method="POST" class="add-form">
+                            <input type="hidden" style="height: 0px;" name="component_id" value="{{.ID}}">
+                            <input type="hidden" style="height: 0px;" name="search" value="{{ $.data.SearchQuery }}">
+                            <button type="submit"  class="button add">
+                                +Добавить
+                            </button>
+                        </form>
+                        <a href="/components/{{ .ID }}" class="button more"> Подробнее...  </a>
+                    </div>
+                </div>
+            {{ end }}
+            </div>
+        </div>
+        {{if .data.CurrentCount}}
+        <div class="bar-chat">
+            <div>{{.data.CurrentCount}}</div>
+            <a href="/availability_calc/{{.data.SystemCalcId}}">
+                <img src= "http://localhost:9000/failivercheck/svg/bar-chat.svg" alt="analitics"/>
+            </a>
+        </div>
+        {{else}}
+        <!-- <div class="bar-chat disable">
+            <img src= "http://localhost:9000/failivercheck/svg/bar-chat.svg" alt="analitics"/>
+        </div> -->
+        {{end}}
+        
+    </body>
+
+</html>
