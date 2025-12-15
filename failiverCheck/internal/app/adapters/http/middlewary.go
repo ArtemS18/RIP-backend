@@ -60,10 +60,10 @@ func (h *Handler) SystemCalcAccessMiddleware() gin.HandlerFunc {
 			h.errorHandler(ctx, http.StatusNotFound, err)
 			return
 		}
-		// if user.IsModerator {
-		// 	ctx.Next()
-		// 	return
-		// }
+		if user.IsModerator {
+			ctx.Next()
+			return
+		}
 		id := h.getIntParam(ctx, "id")
 		if ctx.IsAborted() {
 			return

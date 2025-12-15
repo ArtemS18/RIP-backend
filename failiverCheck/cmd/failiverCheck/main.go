@@ -46,7 +46,7 @@ func main() {
 	configCORS := cors.DefaultConfig()
 	configCORS.AllowOrigins = []string{"*"}
 	configCORS.AllowMethods = []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"}
-	//configCORS.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
+	configCORS.AllowHeaders = []string{"*"}
 	router.Use(cors.New(configCORS))
 	dsnPg := dsn.LoadEnv()
 	fmt.Println(dsnPg)
@@ -66,10 +66,10 @@ func main() {
 	handler := http.NewHandler(pg, minio, uc, config)
 
 	app := app.NewApplication(config, router, handler)
-	_, err = handler.UseCase.UpdateSystemCalcStatusModerator(1, 1, "confirm")
-	if err != nil {
-		logrus.Fatalf("error in test update system calc: %v", errRep)
-	}
+	// _, err = handler.UseCase.UpdateSystemCalcStatusModerator(1, 1, "confirm")
+	// if err != nil {
+	// 	logrus.Fatalf("error in test update system calc: %v", errRep)
+	// }
 	app.RunApplication()
 	log.Println("App terminated")
 }

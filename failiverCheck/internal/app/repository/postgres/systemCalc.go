@@ -172,7 +172,7 @@ func (r *Postgres) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId u
 			logrus.Errorf("Webhook URL returned non-200 status: %d", res.StatusCode)
 			return sys_cacl, fmt.Errorf("webhook URL returned non-200 status: %d", res.StatusCode)
 		}
-		status = ds.FORMED // confirmed
+		status = ds.COMPLETED // confirmed
 	case "reject":
 		status = ds.REJECTED
 	default:
