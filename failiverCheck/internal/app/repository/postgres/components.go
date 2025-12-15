@@ -14,7 +14,7 @@ func (r *Postgres) GetComponents(filters dto.ComponentsFiltersDTO) ([]ds.Compone
 	if filters.Title != "" {
 		q = q.Where("title ILIKE ?", "%"+filters.Title+"%")
 	}
-	q = q.Limit(filters.Limit).Offset(filters.Offset)
+	q = q.Order("id ASC").Limit(filters.Limit).Offset(filters.Offset)
 
 	err := q.Find(&components).Error
 	if err != nil {

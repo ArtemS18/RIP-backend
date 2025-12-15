@@ -100,7 +100,7 @@ func (h *Handler) GetSystemCalcList(ctx *gin.Context) {
 // @Failure      500  {object}  schemas.Error
 // @Router       /system_calcs/my_bucket [get]
 func (h *Handler) GetSystemCalcBucket(ctx *gin.Context) {
-	var userId uint = h.GetUserID(ctx)
+	var userId uint = 0 //h.GetUserID(ctx)
 	if ctx.IsAborted() {
 		return
 	}
