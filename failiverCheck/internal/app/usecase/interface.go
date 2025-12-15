@@ -21,7 +21,7 @@ type Postgres interface {
 	GetSystemCalcList(dto dto.SearchSystemCalcDTO) ([]ds.SystemCalculation, error)
 	UpdateSystemCalcStatusToFormed(userId uint) (ds.SystemCalculation, error)
 	DeleteSystemCalc(userId uint, id uint) error
-	UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error)
+	UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string, url string) (ds.SystemCalculation, error)
 	UpdateSystemCalc(sysCalcId uint, update dto.UpdateSystemCalcDTO) (ds.SystemCalculation, error)
 	CreateOrGetSystemCalc(userId uint) (ds.SystemCalculation, error)
 	GetCountInSysCalc(sysCalcId uint) (int64, error)

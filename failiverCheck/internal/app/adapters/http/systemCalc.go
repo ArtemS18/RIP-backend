@@ -3,6 +3,7 @@ package http
 import (
 	"failiverCheck/internal/app/dto"
 	"failiverCheck/internal/app/schemas"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -120,6 +121,24 @@ func (h *Handler) UpdateSystemCalc(ctx *gin.Context) {
 		return
 	}
 	h.successHandler(ctx, 200, system)
+}
+
+func (h *Handler) UpdateSystemCalcAvailable(ctx *gin.Context) {
+	var data schemas.UpdateSystemCalcAvailable
+	h.validateFields(ctx, &data)
+	if ctx.IsAborted() {
+		return
+	}
+	if data.Token != h.Config.Server.Token {
+		h.errorHandler(ctx, http.StatusUnauthorized, fmt.Errorf("invalid token"))
+		return
+	}
+	_, err := h.UseCase.UpdateSystemCalc(data.SystemCalcID, dto.UpdateSystemCalcDTO{AvailableCalculation: data.Available})
+	if err != nil {
+		h.errorHandler(ctx, http.StatusBadRequest, err)
+		return
+	}
+	h.successHandler(ctx, 200, nil)
 }
 
 // Update system calc status to FORMED by id

@@ -1,12 +1,16 @@
 package postgres
 
 import (
+	"bytes"
+	"encoding/json"
 	"failiverCheck/internal/app/ds"
 	"failiverCheck/internal/app/dto"
 	"fmt"
+	"net/http"
 	"slices"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -137,7 +141,7 @@ func (r *Postgres) UpdateSystemCalc(id uint, dto dto.UpdateSystemCalcDTO) (ds.Sy
 
 	return updatedSystem, nil
 }
-func (r *Postgres) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string) (ds.SystemCalculation, error) {
+func (r *Postgres) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId uint, command string, url string) (ds.SystemCalculation, error) {
 	var sys_cacl ds.SystemCalculation
 	err := r.db.Preload("ComponentsToSystemCalc.Component").Where("id = ? AND status = ?", sysCaclId, ds.FORMED).First(&sys_cacl).Error
 	if err != nil {
@@ -147,14 +151,28 @@ func (r *Postgres) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId u
 		return sys_cacl, err
 	}
 	var status ds.Status
-	var available float32
 	switch command {
 	case "confirm":
-		available, err = calculateAvailable(&sys_cacl)
+		jsonData, err := json.Marshal(sys_cacl)
 		if err != nil {
 			return sys_cacl, err
 		}
-		status = ds.COMPLETED
+		logrus.Infof("Sending request to webhook URL: %s", url)
+		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+		if err != nil {
+			logrus.Errorf("Error: %s", err)
+			return sys_cacl, err
+		}
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			fmt.Printf("client: error making http request: %s\n", err)
+		}
+		defer res.Body.Close()
+		if res.StatusCode != http.StatusOK {
+			logrus.Errorf("Webhook URL returned non-200 status: %d", res.StatusCode)
+			return sys_cacl, fmt.Errorf("webhook URL returned non-200 status: %d", res.StatusCode)
+		}
+		status = ds.FORMED // confirmed
 	case "reject":
 		status = ds.REJECTED
 	default:
@@ -162,9 +180,6 @@ func (r *Postgres) UpdateSystemCalcStatusModerator(sysCaclId uint, moderatorId u
 	}
 	timeClosed := time.Now()
 	dto := dto.UpdateSystemCalcDTO{Status: &status, DateClosed: &timeClosed, ModeratorId: &moderatorId}
-	if available != 0 {
-		dto.AvailableCalculation = &available
-	}
 	return r.UpdateSystemCalc(sysCaclId, dto)
 
 }

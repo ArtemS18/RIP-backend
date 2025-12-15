@@ -48,6 +48,7 @@ func (h *Handler) RegisterComponentHandlers(router *gin.RouterGroup) {
 }
 
 func (h *Handler) RegisterSystemCalcHandlers(router *gin.RouterGroup) {
+	router.PUT("/system_calcs/available", h.UpdateSystemCalcAvailable)
 
 	users := router.Group("", h.AuthoMiddleware())
 	users.GET("/system_calcs/", h.GetSystemCalcList)
@@ -55,6 +56,7 @@ func (h *Handler) RegisterSystemCalcHandlers(router *gin.RouterGroup) {
 	users.GET("/system_calcs/my_bucket", h.GetSystemCalcBucket)
 	users.PUT("/system_calcs/:id", h.SystemCalcAccessMiddleware(), h.UpdateSystemCalc)
 	users.PUT("/system_calcs/:id/status_formed", h.SystemCalcAccessMiddleware(), h.UpdateSystemCalcStatusToFormed)
+
 	users.DELETE("/system_calcs/:id", h.SystemCalcAccessMiddleware(), h.DeleteSystemCalc)
 
 	protected := router.Group("", h.ModeratorValidateMiddleware())

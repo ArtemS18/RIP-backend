@@ -66,6 +66,10 @@ func main() {
 	handler := http.NewHandler(pg, minio, uc, config)
 
 	app := app.NewApplication(config, router, handler)
+	_, err = handler.UseCase.UpdateSystemCalcStatusModerator(1, 1, "confirm")
+	if err != nil {
+		logrus.Fatalf("error in test update system calc: %v", errRep)
+	}
 	app.RunApplication()
 	log.Println("App terminated")
 }

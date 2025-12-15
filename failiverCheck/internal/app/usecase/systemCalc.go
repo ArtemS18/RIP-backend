@@ -71,8 +71,19 @@ func (uc *UseCase) UpdateSystemCalcStatusToFormed(sysCalcId uint) (dto.SystemCal
 	return dto, nil
 }
 
+func (uc *UseCase) UpdateSystemCalcStatusAvailable(sysCalcId uint, available float32) (dto.SystemCalculationDTO, error) {
+	system, err := uc.Postgres.UpdateSystemCalc(sysCalcId, dto.UpdateSystemCalcDTO{
+		AvailableCalculation: &available,
+	})
+	if err != nil {
+		return dto.SystemCalculationDTO{}, err
+	}
+	dto := dto.ToSystemCalculationDTO(system)
+	return dto, nil
+}
+
 func (uc *UseCase) UpdateSystemCalcStatusModerator(sysCalcId uint, moderatorId uint, command string) (dto.SystemCalculationDTO, error) {
-	system, err := uc.Postgres.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, command)
+	system, err := uc.Postgres.UpdateSystemCalcStatusModerator(uint(sysCalcId), moderatorId, command, uc.Config.Server.WebhookURL)
 	if err != nil {
 		return dto.SystemCalculationDTO{}, err
 	}

@@ -6,12 +6,15 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type ServerConfig struct {
-	Host string `mapstructure:"host"`
-	Port int    `mapstructure:"port"`
+	Host       string `mapstructure:"host"`
+	Port       int    `mapstructure:"port"`
+	WebhookURL string `mapstructure:"webhook_url"`
+	Token      string `mapstructure:"service_token"`
 }
 
 type MinioConfig struct {
@@ -81,6 +84,7 @@ func NewConfig() (*Config, error) {
 	if cfg.JWT.SecretKey == "" {
 		return nil, fmt.Errorf("jwt.secret_key is required (ENV or file)")
 	}
+	logrus.Infof("Configuration loaded: %+v", cfg.Server)
 	return cfg, nil
 }
 
